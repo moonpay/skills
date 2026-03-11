@@ -1,0 +1,35 @@
+{
+  "PARTNER_SLUG": "example",
+  "PARTNER_NAME": "ExamplePartner",
+  "PARTNER_TAGLINE": "One-line description of what the partner does",
+  "PARTNER_DESCRIPTION": "2-3 sentence overview. What it is, who it's for, why MoonPay fits.",
+
+  "PARTNER_FEATURES": "- **Feature 1**: Description\n- **Feature 2**: Description\n- **Feature 3**: Description",
+
+  "PARTNER_AUTH": "### Get an API Key\n\nRegister at https://partner.example.com\n\n```bash\nexport PARTNER_API_KEY=\"sk_...\"\n```",
+
+  "PARTNER_ENDPOINTS": "| Endpoint | Method | Description |\n|----------|--------|-------------|\n| `/api/v1/endpoint` | GET | Does something |",
+
+  "PARTNER_EXAMPLE": "```python\n# Example usage code here\n```",
+
+  "MOONPAY_WALLET_INTRO": "One sentence explaining WHY the partner needs a MoonPay wallet (e.g. 'ExamplePartner requires an EVM wallet for payments' or 'ExamplePartner generates unsigned transactions that your wallet signs').",
+
+  "WALLET_NAME": "example-agent",
+  "WALLET_LINK_HEADING": "Link Wallet to ExamplePartner",
+  "WALLET_LINK_INSTRUCTIONS": "```bash\nmp wallet export --wallet \"example-agent\"\n# paste key into partner setup\n```",
+
+  "PRIMARY_CHAIN": "ethereum",
+  "PRIMARY_TOKEN": "USDC",
+  "PRIMARY_TOKEN_FLAG": "usdc_ethereum",
+  "SUGGESTED_AMOUNT": "100",
+
+  "GAS_TOKEN_BUY": "Need ETH for gas?\n```bash\nmp buy --token eth_ethereum --amount 0.05 --wallet <address> --email <email>\n```",
+
+  "BRIDGE_EXAMPLE": "# USDC on Polygon → USDC on Ethereum\nmp token bridge \\\n  --from-wallet example-agent --from-chain polygon \\\n  --from-token 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174 \\\n  --from-amount 100 \\\n  --to-chain ethereum \\\n  --to-token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+
+  "KEY_ADDRESSES": "| Token | Chain | Address |\n|-------|-------|---------|\n| USDC | Ethereum | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48` |\n| ETH (native gas) | Ethereum | `0x0000000000000000000000000000000000000000` |",
+
+  "GETTING_STARTED": "1. Sign up at https://partner.example.com\n2. Create wallet: `mp wallet create --name \"example-agent\"`\n3. Fund: `mp buy --token usdc_ethereum --amount 100 --wallet <address>`\n4. Link wallet to ExamplePartner\n5. Start using the product\n6. Withdraw earnings: `mp virtual-account offramp create`",
+
+  "RESOURCES": "- **Docs:** https://docs.partner.example.com\n- **Platform:** https://partner.example.com\n- **MoonPay CLI:** https://www.npmjs.com/package/@moonpay/cli"
+}
