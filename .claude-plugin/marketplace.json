@@ -1,8 +1,8 @@
 {
   "name": "moonpay-agent-skills",
   "owner": {
-    "name": "MoonPay",
-    "email": "agents@moonpay.com"
+    "name": "Kevin Arifin",
+    "email": "kevin.arifin@moonpay.com"
   },
   "metadata": {
     "description": "MoonPay skills for AI agents",
