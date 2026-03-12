@@ -4,13 +4,43 @@
 
 Skills are instructional folders that AI agents load dynamically to perform specialized tasks. Each skill is a directory containing a `SKILL.md` file with YAML frontmatter and markdown instructions.
 
-## Using Skills
+## Installation
 
-### Claude Code
+### Claude Code — Plugin Marketplace
 
 ```
 /plugin marketplace add moon-labs-dev/moonpay-skills
 /plugin install moonpay-skills
+```
+
+### Claude Code — Manual
+
+Copy any skill directory into your project:
+
+```
+.claude/skills/moonpay-swap-tokens/SKILL.md
+```
+
+Or into your personal skills for use across all projects:
+
+```
+~/.claude/skills/moonpay-swap-tokens/SKILL.md
+```
+
+### Claude.ai
+
+1. Go to **Settings > Features > Skills**
+2. Click **+** and select **Upload a skill**
+3. Upload a ZIP of the skill directory
+
+### Claude API
+
+```python
+skill = client.beta.skills.create(
+    display_title="MoonPay Swap Tokens",
+    files=files_from_dir("skills/moonpay-swap-tokens"),
+    betas=["skills-2025-10-02"],
+)
 ```
 
 ### MCP Server
