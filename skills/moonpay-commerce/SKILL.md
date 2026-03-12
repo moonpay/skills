@@ -2,6 +2,7 @@
 name: moonpay-commerce
 description: Browse Shopify stores, search products, manage a cart, and checkout with crypto via Solana Pay. No login required.
 tags: [commerce, shopping]
+license: Complete terms in LICENSE.txt
 ---
 
 # Shop with crypto

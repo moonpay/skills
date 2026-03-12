@@ -72,32 +72,56 @@ Skills that integrate MoonPay wallet and payment capabilities with third-party p
 
 ## Adding a New Skill
 
-1. Create a skill directory under `skills/`:
+### For partners
 
-```
-skills/
-└── your-skill-name/
-    └── SKILL.md
-```
+If you're a partner integrating with MoonPay, follow these steps to add your skill:
 
-2. Write `SKILL.md` with YAML frontmatter:
+1. Fork this repo and create a branch.
+
+2. Create `skills/your-platform/SKILL.md` with this structure:
 
 ```yaml
 ---
-name: your-skill-name
-description: Replace with description of the skill and when Claude should use it.
+name: your-platform
+description: >
+  What your platform does and how it integrates with MoonPay.
+  Be specific about when Claude should use this skill.
+license: Complete terms in LICENSE.txt
 ---
 
-# Your Skill
+# Your Platform + MoonPay
 
-Instructions, commands, workflows, and examples.
+## Overview
+What your platform does and why it needs a MoonPay wallet.
+
+## Setup
+How to install/configure your platform's CLI or SDK.
+
+## MoonPay Wallet Setup
+How to create and fund a MoonPay wallet for your platform.
+Include the primary chain and token needed.
+
+## Usage
+Key commands and workflows that combine your platform with MoonPay.
+
+## Examples
+Real-world usage examples.
 ```
 
-See [template/SKILL.md](template/SKILL.md) for a minimal starting point.
+3. Copy `LICENSE.txt` from any existing skill into your directory.
 
-3. Add the skill to [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
+4. Open a PR. Include:
+   - A brief description of your platform and the MoonPay integration
+   - Which chain and token your integration uses
+   - Example usage showing the end-to-end workflow
 
-4. Open a PR with the skill directory and updated marketplace config.
+See existing partner skills ([corbits](skills/corbits/), [shipp](skills/shipp/), [dune](skills/dune/), [yield](skills/yield/)) for reference.
+
+### For MoonPay internal skills
+
+1. Create `skills/moonpay-{name}/SKILL.md` following the pattern of existing skills.
+2. Add to the `moonpay-skills` plugin in [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
+3. Open a PR.
 
 ## Resources
 

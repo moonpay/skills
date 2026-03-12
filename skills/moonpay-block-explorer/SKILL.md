@@ -2,6 +2,7 @@
 name: moonpay-block-explorer
 description: Open transactions, wallets, and tokens in the correct block explorer. Use after swaps, bridges, or transfers to view results in the browser.
 tags: [explorer]
+license: Complete terms in LICENSE.txt
 ---
 
 # Block explorer

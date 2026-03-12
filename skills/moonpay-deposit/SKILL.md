@@ -2,6 +2,7 @@
 name: moonpay-deposit
 description: Create deposit links that accept crypto from any chain and auto-convert to stablecoins. No login required.
 tags: [payments]
+license: Complete terms in LICENSE.txt
 ---
 
 # Crypto Deposits

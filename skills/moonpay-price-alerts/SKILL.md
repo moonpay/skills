@@ -2,6 +2,7 @@
 name: moonpay-price-alerts
 description: Set up desktop price alerts that notify you when tokens hit target prices. Observe-only — no trading, just notifications.
 tags: [alerts, research]
+license: Complete terms in LICENSE.txt
 ---
 
 # Price alerts

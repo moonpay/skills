@@ -2,6 +2,7 @@
 name: moonpay-buy-crypto
 description: Buy crypto with fiat via MoonPay. Returns a checkout URL to complete the purchase in a browser.
 tags: [trading]
+license: Complete terms in LICENSE.txt
 ---
 
 # Buy crypto with fiat

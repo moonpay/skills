@@ -2,6 +2,7 @@
 name: moonpay-swap-tokens
 description: Swap tokens on the same chain or bridge tokens across chains. Use when the user wants to swap, bridge, or move tokens.
 tags: [trading]
+license: Complete terms in LICENSE.txt
 ---
 
 # Swap or bridge tokens

@@ -2,6 +2,7 @@
 name: moonpay-upgrade
 description: "Increase your MoonPay API rate limit by paying with crypto via x402."
 tags: [payments]
+license: Complete terms in LICENSE.txt
 ---
 
 # Upgrade Rate Limit
