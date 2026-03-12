@@ -8,12 +8,9 @@ Skills are instructional folders that AI agents load dynamically to perform spec
 
 ### Claude Code
 
-```bash
-# Install a single skill
-npx clawhub@latest install moonpay-skills/moonpay-swap-tokens
-
-# Install the full bundle
-npx clawhub@latest install moonpay-skills
+```
+/plugin marketplace add moon-labs-dev/moonpay-skills
+/plugin install moonpay-skills
 ```
 
 ### MCP Server
