@@ -1,6 +1,7 @@
 ---
 name: dune
 description: Use this skill when the user wants to query blockchain data with SQL, discover on-chain datasets, analyze wallet activity, or monitor DeFi positions. Covers running DuneSQL queries, searching decoded contract tables, and pairing on-chain analysis with MoonPay wallet management to act on findings. Use when the user mentions Dune, DuneSQL, on-chain analytics, blockchain data, or querying transaction history.
+license: Complete terms in LICENSE.txt
 ---
 
 # Dune: Blockchain Analytics for AI Agents

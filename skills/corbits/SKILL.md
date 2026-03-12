@@ -1,6 +1,7 @@
 ---
 name: corbits
 description: Use this skill when the user wants to discover and call paid APIs through the Corbits marketplace, or when they need to set up automatic USDC micropayments for API access via the x402 protocol. Covers Corbits CLI setup, API discovery, and managing a MoonPay EVM wallet as the payment wallet. Use when the user mentions Corbits, paid APIs, x402 payments, or API proxies.
+license: Complete terms in LICENSE.txt
 ---
 
 # Corbits: Paid API Marketplace for AI Agents

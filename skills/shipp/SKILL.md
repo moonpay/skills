@@ -1,6 +1,7 @@
 ---
 name: shipp
 description: Use this skill when the user wants to fetch live sports data — scores, schedules, or game events — and act on it financially. Covers creating Shipp API connections, polling live event data, and managing a MoonPay wallet to trade prediction markets (Polymarket) based on sports signals. Use when the user mentions sports data, game scores, Shipp, or wants to trade on real-world sports outcomes.
+license: Complete terms in LICENSE.txt
 ---
 
 # Shipp: Real-Time Sports & Events Data for AI Agents

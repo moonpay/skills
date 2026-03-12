@@ -1,6 +1,7 @@
 ---
 name: yield
 description: Use this skill when the user wants to find and enter yield opportunities across DeFi protocols, or when they need to deposit tokens into lending pools, liquidity pools, or staking. Covers browsing 2,600+ yield sources across 75+ chains, signing unsigned transactions from YieldAgent with a MoonPay wallet, and funding wallets for deposits. Use when the user mentions yield farming, APY, staking, DeFi yield, Yield.xyz, or passive income on crypto.
+license: Complete terms in LICENSE.txt
 ---
 
 # YieldAgent by Yield.xyz: Multi-Chain Yield Optimization
