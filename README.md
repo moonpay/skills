@@ -72,7 +72,7 @@ Skills that integrate MoonPay wallet and payment capabilities with third-party p
 
 ## Adding a New Skill
 
-### 1. Create the skill directory
+1. Create a skill directory under `skills/`:
 
 ```
 skills/
@@ -80,17 +80,12 @@ skills/
     └── SKILL.md
 ```
 
-### 2. Write SKILL.md
-
-Every skill must have a `SKILL.md` with YAML frontmatter:
+2. Write `SKILL.md` with YAML frontmatter:
 
 ```yaml
 ---
 name: your-skill-name
-description: >
-  What this skill does and when to use it.
-  Be specific about trigger conditions.
-tags: [relevant, tags]
+description: Replace with description of the skill and when Claude should use it.
 ---
 
 # Your Skill
@@ -100,28 +95,9 @@ Instructions, commands, workflows, and examples.
 
 See [template/SKILL.md](template/SKILL.md) for a minimal starting point.
 
-### 3. Skill writing guidelines
+3. Add the skill to [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
 
-- **Description**: Be explicit about when the skill should trigger. Include phrases like "Use when the user mentions X" or "TRIGGER when Y".
-- **Keep SKILL.md concise**: Under 500 lines. Put large reference docs in a `references/` subdirectory.
-- **Progressive disclosure**: Metadata (always loaded) → SKILL.md body (loaded on trigger) → bundled resources (loaded on demand).
-- **Commands**: Include exact CLI commands with examples.
-- **Related skills**: Link to other skills that complement this one.
-
-### 4. Register the skill
-
-Add the skill name to the appropriate plugin in [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
-
-### 5. Open a PR
-
-Create a pull request with your new skill. Include:
-- The skill directory with `SKILL.md`
-- Updated `marketplace.json`
-- A brief description of what the skill does and example usage
-
-## Partner Skills
-
-For adding partner integration skills, see [partners/README.md](partners/README.md). Partner skills follow the same format but are generated from templates to ensure consistency.
+4. Open a PR with the skill directory and updated marketplace config.
 
 ## Resources
 

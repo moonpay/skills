@@ -2,5 +2,3 @@
 __pycache__/
 .idea/
 .vscode/
-*.pyc
-node_modules/
