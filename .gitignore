@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+.idea/
+.vscode/
+*.pyc
+node_modules/
