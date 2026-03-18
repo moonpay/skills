@@ -2,7 +2,6 @@
 name: moonpay-mcp
 description: Set up MoonPay as an MCP server for Claude Desktop or Claude Code. Provides all MoonPay CLI tools via the Model Context Protocol.
 tags: [setup]
-license: Complete terms in LICENSE.txt
 ---
 
 # MoonPay MCP Setup

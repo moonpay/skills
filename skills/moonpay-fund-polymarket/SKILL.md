@@ -2,7 +2,6 @@
 name: moonpay-fund-polymarket
 description: Install the Polymarket CLI and fund its wallet with USDC.e and POL on Polygon via MoonPay.
 tags: [trading, setup, polymarket, polygon]
-license: Complete terms in LICENSE.txt
 ---
 
 # Fund Polymarket

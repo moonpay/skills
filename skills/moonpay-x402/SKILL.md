@@ -2,7 +2,6 @@
 name: moonpay-x402
 description: Make paid API requests to x402-protected endpoints. Automatically handles payment with your local wallet.
 tags: [payments, api]
-license: Complete terms in LICENSE.txt
 ---
 
 # x402 paid API requests

@@ -10,8 +10,7 @@
 
 ## Checklist
 
-- [ ] `skills/{name}/SKILL.md` with YAML frontmatter (`name`, `description`, `license`)
-- [ ] `skills/{name}/LICENSE.txt`
+- [ ] `skills/{name}/SKILL.md` with YAML frontmatter (`name`, `description`)
 - [ ] Skill added to `.claude-plugin/marketplace.json`
 - [ ] Description is specific about when Claude should trigger this skill
 

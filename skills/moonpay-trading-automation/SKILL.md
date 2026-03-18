@@ -2,7 +2,6 @@
 name: moonpay-trading-automation
 description: Set up automated trading strategies — DCA, limit orders, and stop losses — by composing mp CLI commands with OS scheduling (cron/launchd).
 tags: [trading, automation]
-license: Complete terms in LICENSE.txt
 ---
 
 # Trading automation

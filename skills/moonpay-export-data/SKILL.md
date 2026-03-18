@@ -2,7 +2,6 @@
 name: moonpay-export-data
 description: Export portfolio balances and transaction history to CSV or JSON files. Use for spreadsheets, tax reporting, or record-keeping.
 tags: [portfolio, export]
-license: Complete terms in LICENSE.txt
 ---
 
 # Export data

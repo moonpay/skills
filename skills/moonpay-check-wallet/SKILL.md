@@ -2,7 +2,6 @@
 name: moonpay-check-wallet
 description: Check wallet balances and holdings. Use for "what's in my wallet", portfolio breakdown, token balances, allocation percentages, and USD values.
 tags: [portfolio]
-license: Complete terms in LICENSE.txt
 ---
 
 # Check wallet

@@ -2,7 +2,6 @@
 name: moonpay-hardware-wallet
 description: Connect a hardware wallet (Ledger) to the MoonPay CLI. Sign transactions on the physical device — no private keys stored locally.
 tags: [wallet]
-license: Complete terms in LICENSE.txt
 ---
 
 # Hardware wallet support

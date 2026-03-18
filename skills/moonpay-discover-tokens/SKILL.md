@@ -2,7 +2,6 @@
 name: moonpay-discover-tokens
 description: Search for tokens, check prices, get trading briefs, and evaluate risk. Use for token research, "is this token safe?", price checks, and market analysis.
 tags: [research]
-license: Complete terms in LICENSE.txt
 ---
 
 # Discover tokens

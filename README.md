@@ -86,16 +86,6 @@ See the [moonpay-mcp](skills/moonpay-mcp/SKILL.md) skill for setup details.
 | [moonpay-price-alerts](skills/moonpay-price-alerts/) | Desktop notifications when tokens hit target prices |
 | [moonpay-commerce](skills/moonpay-commerce/) | Browse Shopify stores and checkout with crypto |
 
-### Partner Skills
-
-Skills that integrate MoonPay wallet and payment capabilities with third-party platforms.
-
-| Skill | Description |
-|-------|-------------|
-| [corbits](skills/corbits/) | Paid API marketplace with x402 USDC micropayments |
-| [dune](skills/dune/) | On-chain analytics with wallet management |
-| [shipp](skills/shipp/) | Sports data and Polymarket trading |
-| [yield](skills/yield/) | Multi-chain yield opportunities |
 
 ## Adding a New Skill
 
@@ -113,7 +103,6 @@ name: your-platform
 description: >
   What your platform does and how it integrates with MoonPay.
   Be specific about when Claude should use this skill.
-license: Complete terms in LICENSE.txt
 ---
 
 # Your Platform + MoonPay
@@ -135,14 +124,12 @@ Key commands and workflows that combine your platform with MoonPay.
 Real-world usage examples.
 ```
 
-3. Copy `LICENSE.txt` from any existing skill into your directory.
-
-4. Open a PR. Include:
+3. Open a PR. Include:
    - A brief description of your platform and the MoonPay integration
    - Which chain and token your integration uses
    - Example usage showing the end-to-end workflow
 
-See existing partner skills ([corbits](skills/corbits/), [shipp](skills/shipp/), [dune](skills/dune/), [yield](skills/yield/)) for reference.
+See existing skills under `skills/` for reference.
 
 ### For MoonPay internal skills
 

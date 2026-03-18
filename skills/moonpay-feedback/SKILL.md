@@ -2,7 +2,6 @@
 name: moonpay-feedback
 description: Submit feedback, bug reports, or feature requests for the MoonPay CLI. Use when the user encounters issues, wants to suggest improvements, or has general feedback.
 tags: [support]
-license: Complete terms in LICENSE.txt
 ---
 
 # Submit feedback

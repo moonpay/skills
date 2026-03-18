@@ -2,7 +2,6 @@
 name: moonpay-missions
 description: A series of missions that walk through every MoonPay CLI capability. Use when the user is new or says "get started", "show me what you can do", or "run the missions".
 tags: [setup]
-license: Complete terms in LICENSE.txt
 ---
 
 # MoonPay Missions

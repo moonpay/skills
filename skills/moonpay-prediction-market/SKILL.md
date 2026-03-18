@@ -2,7 +2,6 @@
 name: moonpay-prediction-market
 description: Trade on prediction markets (Polymarket, Kalshi). Search markets, buy/sell positions, track PnL, and view trade history.
 tags: [trading, prediction-market, polymarket, kalshi]
-license: Complete terms in LICENSE.txt
 ---
 
 # Prediction markets

@@ -2,7 +2,6 @@
 name: moonpay-auth
 description: Set up the MoonPay CLI, authenticate, and manage local wallets. Use when commands fail, for login, or to create/import wallets.
 tags: [setup]
-license: Complete terms in LICENSE.txt
 ---
 
 # MoonPay auth and setup
