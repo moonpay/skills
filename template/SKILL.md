@@ -1,5 +1,5 @@
 ---
-name: your-skill-name
+name: partner-skill-name
 description: >
   Describe what this skill does and when an AI agent should use it.
   Be specific — this field determines whether Claude loads this skill.

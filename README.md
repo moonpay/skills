@@ -93,7 +93,7 @@ We welcome contributions! Whether you're a partner integrating with MoonPay or a
 
 1. Fork this repo and create a branch.
 
-2. Create `skills/{name}/SKILL.md` using the [template](template/SKILL.md). Your skill should:
+2. Create `skills/{partner}-{name}/SKILL.md` using the [template](template/SKILL.md). Use your company/project name as a prefix (e.g., `corbits-marketplace`, `dune-analytics`). Your skill should:
    - Have a clear `name` and `description` in the YAML frontmatter
    - Describe **when** an AI agent should use this skill
    - Reference MoonPay CLI commands (`mp`) for any wallet, trading, or payment functionality
