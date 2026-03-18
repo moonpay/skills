@@ -15,7 +15,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/corbits",
+        "./skills/corbits-marketplace",
         "./skills/moonpay-auth",
         "./skills/moonpay-block-explorer",
         "./skills/moonpay-buy-crypto",
