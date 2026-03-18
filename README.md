@@ -108,6 +108,5 @@ See existing skills under `skills/` and the [PR template](.github/PULL_REQUEST_T
 
 ## Resources
 
-- [Agent Skills Specification](https://agentskills.io/specification)
 - [MoonPay CLI](https://www.npmjs.com/package/@moonpay/cli) (`npm i -g @moonpay/cli`)
 - [MoonPay for Agents](https://agents.moonpay.com)
