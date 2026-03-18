@@ -15,7 +15,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/dune",
+        "./skills/dune-analytics",
         "./skills/moonpay-auth",
         "./skills/moonpay-block-explorer",
         "./skills/moonpay-buy-crypto",
