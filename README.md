@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/banner.png" alt="MoonPay Agents" />
+</p>
+
 # MoonPay Skills
 
 [Agent Skills](https://agentskills.io) for crypto infrastructure — wallet management, token trading, cross-chain bridges, fiat on/off ramp, prediction markets, and more.
