@@ -10,10 +10,9 @@ Skills are **not code** — they are instructional guides. All execution happens
 
 ## Repository Structure
 
-- `skills/` — All skill definitions (each skill is a directory with `SKILL.md` and `LICENSE.txt`)
-- `.claude-plugin/marketplace.json` — Plugin registry defining two groups: `moonpay-skills` (core) and `partner-skills` (third-party integrations)
-- `spec/agent-skills-spec.md` — Links to the full Agent Skills Specification at https://agentskills.io/specification
-- `template/SKILL.md` — Minimal template for creating new skills
+- `skills/` — All skill definitions (each skill is a directory with a `SKILL.md`)
+- `.claude-plugin/marketplace.json` — Plugin registry listing all skills
+- `template/SKILL.md` — Template for creating new skills
 
 ## Skill Anatomy
 
@@ -30,13 +29,13 @@ The body contains instructions for the agent: setup commands, workflows, configu
 ## Adding a New Skill
 
 1. Create `skills/{name}/SKILL.md` using the template in `template/SKILL.md`
-2. Add the skill entry to `.claude-plugin/marketplace.json` under the appropriate plugin group
-4. The PR template (`.github/PULL_REQUEST_TEMPLATE.md`) defines the required checklist
+2. Add the skill entry to `.claude-plugin/marketplace.json`
+3. The PR template (`.github/PULL_REQUEST_TEMPLATE.md`) defines the required checklist
 
-## Skill Groups in marketplace.json
+## Naming Convention
 
-- **moonpay-skills** — Core MoonPay capabilities (auth, wallets, trading, fiat ramp, etc.)
-- **partner-skills** — Third-party integrations (corbits, dune, shipp, yield)
+- MoonPay skills: `skills/moonpay-{name}/` (e.g., `moonpay-swap-tokens`)
+- Partner skills: `skills/{partner}-{name}/` (e.g., `corbits-marketplace`, `dune-analytics`)
 
 ## Key Conventions
 

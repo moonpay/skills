@@ -1,6 +1,6 @@
 ## New Skill
 
-**Skill name:** `skills/your-skill-name/`
+**Skill name:** `skills/{partner}-{name}/` (e.g., `corbits-marketplace`)
 
 **Description:** What does this skill do?
 

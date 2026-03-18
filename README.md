@@ -9,7 +9,7 @@ Skills are instructional folders that AI agents load dynamically to perform spec
 ### Claude Code — Plugin Marketplace
 
 ```
-/plugin marketplace add moon-labs-dev/moonpay-skills
+/plugin marketplace add moonpay/skills
 /plugin install moonpay-skills
 ```
 
@@ -87,58 +87,26 @@ See the [moonpay-mcp](skills/moonpay-mcp/SKILL.md) skill for setup details.
 | [moonpay-commerce](skills/moonpay-commerce/) | Browse Shopify stores and checkout with crypto |
 
 
-## Adding a New Skill
+## Contributing
 
-### For partners
-
-If you're a partner integrating with MoonPay, follow these steps to add your skill:
+We welcome contributions! Whether you're a partner integrating with MoonPay or a community member, here's how to add a skill:
 
 1. Fork this repo and create a branch.
 
-2. Create `skills/your-platform/SKILL.md` with this structure:
+2. Create `skills/{partner}-{name}/SKILL.md` using the [template](template/SKILL.md). Use your company/project name as a prefix (e.g., `corbits-marketplace`, `dune-analytics`). Your skill should:
+   - Have a clear `name` and `description` in the YAML frontmatter
+   - Describe **when** an AI agent should use this skill
+   - Reference MoonPay CLI commands (`mp`) for any wallet, trading, or payment functionality
 
-```yaml
----
-name: your-platform
-description: >
-  What your platform does and how it integrates with MoonPay.
-  Be specific about when Claude should use this skill.
----
+3. Add your skill to the `moonpay-skills` plugin in [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
 
-# Your Platform + MoonPay
-
-## Overview
-What your platform does and why it needs a MoonPay wallet.
-
-## Setup
-How to install/configure your platform's CLI or SDK.
-
-## MoonPay Wallet Setup
-How to create and fund a MoonPay wallet for your platform.
-Include the primary chain and token needed.
-
-## Usage
-Key commands and workflows that combine your platform with MoonPay.
-
-## Examples
-Real-world usage examples.
-```
-
-3. Open a PR. Include:
-   - A brief description of your platform and the MoonPay integration
-   - Which chain and token your integration uses
+4. Open a PR with:
+   - A brief description of what the skill does
    - Example usage showing the end-to-end workflow
 
-See existing skills under `skills/` for reference.
-
-### For MoonPay internal skills
-
-1. Create `skills/moonpay-{name}/SKILL.md` following the pattern of existing skills.
-2. Add to the `moonpay-skills` plugin in [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
-3. Open a PR.
+See existing skills under `skills/` and the [PR template](.github/PULL_REQUEST_TEMPLATE.md) for reference. All contributions are covered by the repo [LICENSE](LICENSE).
 
 ## Resources
 
-- [Agent Skills Specification](https://agentskills.io/specification)
 - [MoonPay CLI](https://www.npmjs.com/package/@moonpay/cli) (`npm i -g @moonpay/cli`)
 - [MoonPay for Agents](https://agents.moonpay.com)
