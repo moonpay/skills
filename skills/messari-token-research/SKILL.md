@@ -62,7 +62,7 @@ Extract: name, symbol, market cap, circulating supply, max supply, category, des
 ```bash
 mp x402 request \
   --method GET \
-  --url "https://api.messari.io/v1/assets/timeseries/{slug}?granularity=daily&start_date=$(date -v-30d +%Y-%m-%d)&end_date=$(date +%Y-%m-%d)" \
+  --url "https://api.messari.io/v1/assets/timeseries/{slug}?granularity=daily&start_date=$(date -d "30 days ago" +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)&end_date=$(date +%Y-%m-%d)" \
   --wallet main \
   --chain base
 ```
