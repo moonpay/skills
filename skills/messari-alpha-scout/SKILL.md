@@ -163,7 +163,7 @@ echo "Pass results to Messari AI for narrative synthesis (Step 5)"
 
 ## Schedule as a daily morning brief
 
-macOS launchd (runs every day at 7:00 AM):
+Schedule with cron (runs every day at 7:00 AM):
 
 ```bash
 # Add to crontab
