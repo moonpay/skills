@@ -80,7 +80,7 @@
     },
     {
       "name": "dune-skills",
-      "description": "Blockchain analytics via Dune REST API — run DuneSQL queries against live on-chain data",
+      "description": "Blockchain analytics via Dune REST API — DuneSQL queries against live on-chain data",
       "source": "./",
       "strict": false,
       "skills": [
