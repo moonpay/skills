@@ -36,6 +36,19 @@
         "./skills/moonpay-virtual-account",
         "./skills/moonpay-x402"
       ]
+    },
+    {
+      "name": "messari-skills",
+      "description": "Messari x402 research skills — pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/messari-x402",
+        "./skills/messari-token-research",
+        "./skills/messari-alpha-scout",
+        "./skills/messari-funding-intel",
+        "./skills/messari-deep-research"
+      ]
     }
   ]
 }
