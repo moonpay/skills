@@ -39,6 +39,15 @@
       ]
     },
     {
+      "name": "myriad-skills",
+      "description": "BNB Chain prediction market trading via Myriad Markets CLI",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/myriad-prediction-markets"
+      ]
+    },
+    {
       "name": "messari-skills",
       "description": "Messari x402 research skills — pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
       "source": "./",
