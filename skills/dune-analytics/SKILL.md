@@ -31,7 +31,7 @@ export DUNE_API_KEY="your-api-key"
 |--------|--------|----------|
 | Execute a saved query | POST | `/query/{query_id}/execute` |
 | Get execution status + results | GET | `/execution/{execution_id}/results` |
-| Execute raw SQL directly | POST | `/query/execute` |
+| Execute raw SQL directly | POST | `/sql/execute` |
 | Cancel execution | POST | `/execution/{execution_id}/cancel` |
 | Get query definition | GET | `/query/{query_id}` |
 
@@ -68,11 +68,11 @@ done
 ### Execute Raw DuneSQL
 
 ```bash
-curl -s -X POST "https://api.dune.com/api/v1/query/execute" \
+curl -s -X POST "https://api.dune.com/api/v1/sql/execute" \
   -H "X-Dune-API-Key: $DUNE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "query_sql": "SELECT block_time, hash, value/1e18 AS eth FROM ethereum.transactions WHERE lower(\"from\") = lower('0xYOUR_WALLET') ORDER BY block_time DESC LIMIT 20",
+    "sql": "SELECT block_time, hash, value/1e18 AS eth FROM ethereum.transactions WHERE lower(\"from\") = lower('0xYOUR_WALLET') ORDER BY block_time DESC LIMIT 20",
     "performance": "medium"
   }' | jq '.execution_id'
 ```
@@ -111,11 +111,11 @@ mp wallet retrieve --wallet "dune-agent-wallet"
 ```bash
 WALLET=$(mp wallet retrieve --wallet "dune-agent-wallet" --json | jq -r '.addresses.ethereum')
 
-EXEC_ID=$(curl -s -X POST "https://api.dune.com/api/v1/query/execute" \
+EXEC_ID=$(curl -s -X POST "https://api.dune.com/api/v1/sql/execute" \
   -H "X-Dune-API-Key: $DUNE_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{\
-    \"query_sql\": \"SELECT block_time, hash, value/1e18 AS eth, \\\"to\\\" FROM ethereum.transactions WHERE lower(\\\"from\\\") = lower('$WALLET') ORDER BY block_time DESC LIMIT 20\",\
+    \"sql\": \"SELECT block_time, hash, value/1e18 AS eth, \\\"to\\\" FROM ethereum.transactions WHERE lower(\\\"from\\\") = lower('$WALLET') ORDER BY block_time DESC LIMIT 20\",\
     \"performance\": \"medium\"\
   }" | jq -r '.execution_id')
 
