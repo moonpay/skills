@@ -11,11 +11,10 @@
   "plugins": [
     {
       "name": "moonpay-skills",
-      "description": "Crypto infrastructure skills for AI agents \u2014 wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
+      "description": "Crypto infrastructure skills for AI agents — wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/dune-analytics",
         "./skills/moonpay-auth",
         "./skills/moonpay-block-explorer",
         "./skills/moonpay-buy-crypto",
@@ -37,37 +36,6 @@
         "./skills/moonpay-upgrade",
         "./skills/moonpay-virtual-account",
         "./skills/moonpay-x402"
-      ]
-    },
-    {
-      "name": "myriad-skills",
-      "description": "BNB Chain prediction market trading via Myriad Markets CLI",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/myriad-prediction-markets"
-      ]
-    },
-    {
-      "name": "messari-skills",
-      "description": "Messari x402 research skills — pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/messari-x402",
-        "./skills/messari-token-research",
-        "./skills/messari-alpha-scout",
-        "./skills/messari-funding-intel",
-        "./skills/messari-deep-research"
-      ]
-    },
-    {
-      "name": "corbits-skills",
-      "description": "Paid API marketplace with x402 USDC micropayments via Corbits",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/corbits-marketplace"
       ]
     },
     {
@@ -108,6 +76,15 @@
       "strict": false,
       "skills": [
         "./skills/corbits-marketplace"
+      ]
+    },
+    {
+      "name": "dune-skills",
+      "description": "Blockchain analytics via Dune REST API — run DuneSQL queries against live on-chain data",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/dune-analytics"
       ]
     }
   ]
