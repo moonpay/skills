@@ -36,6 +36,15 @@
         "./skills/moonpay-virtual-account",
         "./skills/moonpay-x402"
       ]
+    },
+    {
+      "name": "yield-skills",
+      "description": "Multi-chain yield optimization via Yield.xyz and StakeKit",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/yield-optimization"
+      ]
     }
   ]
 }
