@@ -108,20 +108,6 @@ mp prediction-market position buy \
   --size 50
 ```
 
-## Execute Trades on Signal
-
-When a Shipp event signals a near-final score or key game event, place the Polymarket trade:
-
-```bash
-mp prediction-market position buy \
-  --wallet shipp-sports-agent \
-  --provider polymarket \
-  --tokenId <outcome-token-id> \
-  --price 0.85 \
-  --size 50
-```
-
-Use `mp prediction-market market search --provider polymarket --query "<team name>"` to find the relevant tokenId before the game starts.
 
 ## Wallet Operations
 
