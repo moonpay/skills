@@ -10,41 +10,31 @@ Skills are instructional folders that AI agents load dynamically to perform spec
 
 ## Installation
 
+### Any Agent (Recommended)
+
+```bash
+npx skills add moonpay/skills
+```
+
+This uses the [Skills CLI](https://github.com/vercel-labs/skills) to install skills via symlink. Works with Claude Code, Cursor, Windsurf, Codex, and [40+ other agents](https://github.com/vercel-labs/skills#supported-agents). Skills stay up to date — run `npx skills update` to pull the latest.
+
+Install specific skills:
+
+```bash
+npx skills add moonpay/skills --skill moonpay-swap-tokens
+```
+
+Install globally (available across all projects):
+
+```bash
+npx skills add moonpay/skills --global
+```
+
 ### Claude Code — Plugin Marketplace
 
 ```
 /plugin marketplace add moonpay/skills
 /plugin install moonpay-skills
-```
-
-### Claude Code — Manual
-
-Copy any skill directory into your project:
-
-```
-.claude/skills/moonpay-swap-tokens/SKILL.md
-```
-
-Or into your personal skills for use across all projects:
-
-```
-~/.claude/skills/moonpay-swap-tokens/SKILL.md
-```
-
-### Claude.ai
-
-1. Go to **Settings > Features > Skills**
-2. Click **+** and select **Upload a skill**
-3. Upload a ZIP of the skill directory
-
-### Claude API
-
-```python
-skill = client.beta.skills.create(
-    display_title="MoonPay Swap Tokens",
-    files=files_from_dir("skills/moonpay-swap-tokens"),
-    betas=["skills-2025-10-02"],
-)
 ```
 
 ### MCP Server
@@ -86,31 +76,41 @@ See the [moonpay-mcp](skills/moonpay-mcp/SKILL.md) skill for setup details.
 |-------|-------------|
 | [moonpay-prediction-market](skills/moonpay-prediction-market/) | Trade on Polymarket and Kalshi |
 | [moonpay-fund-polymarket](skills/moonpay-fund-polymarket/) | Fund a Polymarket wallet with USDC.e on Polygon |
+| [moonpay-scout](skills/moonpay-scout/) | Cross-platform prediction market arbitrage scanner |
 | [moonpay-trading-automation](skills/moonpay-trading-automation/) | DCA, limit orders, and stop losses via cron |
 | [moonpay-price-alerts](skills/moonpay-price-alerts/) | Desktop notifications when tokens hit target prices |
 | [moonpay-commerce](skills/moonpay-commerce/) | Browse Shopify stores and checkout with crypto |
 
+### Research & Analytics
+
+| Skill | Description |
+|-------|-------------|
+| [messari-x402](skills/messari-x402/) | Access Messari's full API via x402 micropayments |
+| [messari-token-research](skills/messari-token-research/) | Token research workflow via Messari |
+| [messari-alpha-scout](skills/messari-alpha-scout/) | Alpha scouting — trending narratives and momentum |
+| [messari-funding-intel](skills/messari-funding-intel/) | VC funding rounds and M&A intelligence |
+| [messari-deep-research](skills/messari-deep-research/) | Long-form AI research reports |
+
+### Partner Skills
+
+| Skill | Description |
+|-------|-------------|
+| [corbits-marketplace](skills/corbits-marketplace/) | Paid API marketplace with x402 micropayments |
+| [myriad-prediction-markets](skills/myriad-prediction-markets/) | BNB Chain prediction market trading |
 
 ## Contributing
 
-We welcome contributions! Whether you're a partner integrating with MoonPay or a community member, here's how to add a skill:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full skill quality rubric and submission guide. Only A+ skills are merged.
 
-1. Fork this repo and create a branch.
+Quick start:
 
-2. Create `skills/{partner}-{name}/SKILL.md` using the [template](template/SKILL.md). Use your company/project name as a prefix (e.g., `corbits-marketplace`, `dune-analytics`). Your skill should:
-   - Have a clear `name` and `description` in the YAML frontmatter
-   - Describe **when** an AI agent should use this skill
-   - Reference MoonPay CLI commands (`mp`) for any wallet, trading, or payment functionality
-
-3. Add your skill to the `moonpay-skills` plugin in [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
-
-4. Open a PR with:
-   - A brief description of what the skill does
-   - Example usage showing the end-to-end workflow
-
-See existing skills under `skills/` and the [PR template](.github/PULL_REQUEST_TEMPLATE.md) for reference. All contributions are covered by the repo [LICENSE](LICENSE).
+1. Fork this repo and create a branch
+2. Create `skills/{partner}-{name}/SKILL.md` using the [template](template/SKILL.md)
+3. Add your skill to `.claude-plugin/marketplace.json` in its own plugin block
+4. Open a PR — every CLI command in your skill must be real and verifiable
 
 ## Resources
 
 - [MoonPay CLI](https://www.npmjs.com/package/@moonpay/cli) (`npm i -g @moonpay/cli`)
 - [MoonPay for Agents](https://agents.moonpay.com)
+- [Skills CLI](https://github.com/vercel-labs/skills) (`npx skills add moonpay/skills`)

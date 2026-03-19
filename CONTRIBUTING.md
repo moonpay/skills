@@ -68,6 +68,6 @@ MoonPay first-party skills go in the `moonpay-skills` plugin block. Partner skil
 1. **Bare skill names** — `skills/dune/` instead of `skills/dune-analytics/`. Always use `{partner}-{name}`.
 2. **Dumping partner skills into `moonpay-skills`** — Partner skills get their own plugin block.
 3. **Embedding code** — No Python, TypeScript, or any other code. Use CLI commands and API calls only.
-4. **Copying wallet/funding instructions** — Don't duplicate what `moonpay-buy-crypto`, `moonpay-check-wallet`, and `moonpay-swap-tokens` already cover. Cross-reference them.
+4. **Copying wallet/funding instructions** — Each skill should be self-contained, so duplicating wallet setup and funding instructions is fine. Just make sure the duplicated content is accurate.
 5. **Referencing skills that don't exist** — Check the repo before adding Related Skills links.
 6. **Unverifiable commands** — If you reference a CLI tool, it must be a real, installable package. Include the install command in Prerequisites.
