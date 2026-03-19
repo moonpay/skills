@@ -194,6 +194,8 @@ mp token bridge \
 ### Export Key for Myriad
 
 ```bash
+# ⚠️ Your private key gives full access to your wallet.
+# Never share it, commit it to version control, or reuse it across services.
 mp wallet export --wallet "myriad-agent"
 # Copy EVM private key → use in myriad wallet setup or MYRIAD_PRIVATE_KEY
 ```
