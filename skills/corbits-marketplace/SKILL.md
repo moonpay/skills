@@ -46,6 +46,9 @@ mp wallet retrieve --wallet "corbits-agent"  # note your EVM address
 mp buy --token usdc_ethereum --amount 50 --wallet <evm-address> --email <email>
 
 # 3. Export private key for Corbits
+# ⚠️ Security: your private key gives full access to your wallet.
+# Never share it, commit it, or paste it anywhere other than the corbits init prompt.
+# Use a dedicated low-balance wallet — not your primary wallet.
 mp wallet export --wallet "corbits-agent"
 # Copy the EVM private key
 
