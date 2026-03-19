@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "moonpay-skills",
-      "description": "Crypto infrastructure skills for AI agents \u2014 wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
+      "description": "Crypto infrastructure skills for AI agents — wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
       "source": "./",
       "strict": false,
       "skills": [
@@ -35,7 +35,15 @@
         "./skills/moonpay-trading-automation",
         "./skills/moonpay-upgrade",
         "./skills/moonpay-virtual-account",
-        "./skills/moonpay-x402",
+        "./skills/moonpay-x402"
+      ]
+    },
+    {
+      "name": "shipp-skills",
+      "description": "Real-time sports data for prediction market agents via Shipp API",
+      "source": "./",
+      "strict": false,
+      "skills": [
         "./skills/shipp-sports-data"
       ]
     },
