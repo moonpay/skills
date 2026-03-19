@@ -1,13 +1,13 @@
 ---
 name: dune-analytics
 description: >
-  Blockchain analytics via Dune CLI — run DuneSQL queries against live on-chain data, discover decoded contract tables, search datasets by keyword or contract address, and monitor credit usage. Pair with MoonPay to create and fund the wallets you analyze, and move assets informed by your findings.
+  Blockchain analytics via Dune REST API — execute DuneSQL queries against live on-chain data, discover decoded contract tables, and monitor credit usage. Use when the user asks about on-chain data, wallet activity, DEX trades, token transfers, smart contract events, or says "query Dune", "run a Dune query", or "search Dune datasets". Pairs with MoonPay to analyze wallets you create and fund.
 tags: [blockchain, analytics, dune, on-chain, data, defi, sql]
 ---
 
 # Dune Analytics
 
-Query live on-chain data with the Dune CLI — a command-line interface for [Dune Analytics](https://dune.com). Run DuneSQL, discover datasets, and monitor credit usage. Pair with MoonPay to manage the wallets you analyze.
+Query live on-chain data via the [Dune REST API](https://docs.dune.com/api-reference/overview/introduction). Pair with MoonPay to create and fund the wallets you analyze.
 
 ## Setup
 
@@ -17,100 +17,80 @@ Query live on-chain data with the Dune CLI — a command-line interface for [Dun
 2. Go to **Settings → API Keys → Create new key**
 
 ```bash
-# Set for current session
 export DUNE_API_KEY="your-api-key"
-
-# Or save permanently (prompted from stdin)
-dune auth
 ```
 
-**Key priority order:** `--api-key` flag → `$DUNE_API_KEY` env var → `~/.config/dune/config.yaml`
-
-The Dune CLI auto-installs on first use — just run any `dune` command.
+**Base URL:** `https://api.dune.com/api/v1`  
+**Auth header:** `X-Dune-API-Key: $DUNE_API_KEY`
 
 ---
 
-## Key Commands
+## Key Endpoints
 
-| Command | Description |
-|---------|-------------|
-| `dune query run-sql --sql "<sql>"` | Execute raw DuneSQL directly |
-| `dune query run <id>` | Execute a saved query |
-| `dune query get <id>` | Fetch a saved query's SQL and metadata |
-| `dune query create` | Create a new saved query |
-| `dune query update <id>` | Update an existing query |
-| `dune query archive <id>` | Archive a saved query |
-| `dune execution results <id>` | Fetch results of a previous execution |
-| `dune dataset search --query "<term>"` | Discover datasets by keyword |
-| `dune dataset search-by-contract --contract-address <addr>` | Find decoded tables for a contract |
-| `dune docs search --query "<term>"` | Search Dune documentation |
-| `dune usage` | Check credit consumption |
-| `dune auth` | Save API key to config |
-
-> **Always use `-o json`** — JSON output contains more detail than `text` and is unambiguous to parse.
+| Action | Method | Endpoint |
+|--------|--------|----------|
+| Execute a saved query | POST | `/query/{query_id}/execute` |
+| Get execution status + results | GET | `/execution/{execution_id}/results` |
+| Execute raw SQL directly | POST | `/query/execute` |
+| Cancel execution | POST | `/execution/{execution_id}/cancel` |
+| Get query definition | GET | `/query/{query_id}` |
 
 ---
 
 ## Common Workflows
 
-### Ad-hoc SQL
+### Run a Saved Query
 
 ```bash
-dune query run-sql --sql "
-  SELECT block_time, hash, value / 1e18 AS eth_value, \"to\", \"from\"
-  FROM ethereum.transactions
-  WHERE lower(\"from\") = lower('0xYOUR_WALLET')
-     OR lower(\"to\")   = lower('0xYOUR_WALLET')
-  ORDER BY block_time DESC
-  LIMIT 20
-" -o json
+# 1. Execute
+EXEC=$(curl -s -X POST "https://api.dune.com/api/v1/query/3237661/execute" \
+  -H "X-Dune-API-Key: $DUNE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"performance": "medium"}')
+
+EXEC_ID=$(echo $EXEC | jq -r '.execution_id')
+echo "execution_id: $EXEC_ID"
+
+# 2. Poll until complete
+while true; do
+  STATUS=$(curl -s "https://api.dune.com/api/v1/execution/$EXEC_ID/results" \
+    -H "X-Dune-API-Key: $DUNE_API_KEY")
+  STATE=$(echo $STATUS | jq -r '.state')
+  echo "State: $STATE"
+  if [[ "$STATE" == "QUERY_STATE_COMPLETED" || "$STATE" == "QUERY_STATE_FAILED" ]]; then
+    echo $STATUS | jq '.result.rows[:5]'
+    break
+  fi
+  sleep 3
+done
 ```
 
-### Discover Tables, Then Query
+### Execute Raw DuneSQL
 
 ```bash
-# Find relevant tables with column schemas
-dune dataset search --query "uniswap v3 swaps" --categories decoded --include-schema -o json
-
-# Query the discovered table
-dune query run-sql --sql "SELECT * FROM uniswap_v3_ethereum.evt_Swap LIMIT 10" -o json
+curl -s -X POST "https://api.dune.com/api/v1/query/execute" \
+  -H "X-Dune-API-Key: $DUNE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query_sql": "SELECT block_time, hash, value/1e18 AS eth FROM ethereum.transactions WHERE lower(\"from\") = lower('0xYOUR_WALLET') ORDER BY block_time DESC LIMIT 20",
+    "performance": "medium"
+  }' | jq '.execution_id'
 ```
 
-### Find Tables for a Specific Contract
+### Query with Parameters
 
 ```bash
-dune dataset search-by-contract \
-  --contract-address 0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984 \
-  --include-schema -o json
+curl -s -X POST "https://api.dune.com/api/v1/query/3237661/execute" \
+  -H "X-Dune-API-Key: $DUNE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query_parameters": {
+      "wallet": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "days": 30
+    },
+    "performance": "medium"
+  }' | jq '.execution_id'
 ```
-
-### Save a Reusable Parameterized Query
-
-```bash
-# Create with parameters
-dune query create \
-  --name "Wallet Activity" \
-  --sql "SELECT block_time, hash, value/1e18 AS eth
-         FROM ethereum.transactions
-         WHERE lower(\"from\") = lower('{{wallet}}')
-         ORDER BY block_time DESC LIMIT {{row_limit}}" -o json
-
-# Run with parameter values
-dune query run <returned-id> --param wallet=0xABC... --param row_limit=50 -o json
-```
-
-### Long-Running Query (Submit and Poll)
-
-```bash
-# Submit without waiting
-dune query run 12345 --no-wait --performance large -o json
-# → {"execution_id": "01ABC...", "state": "QUERY_STATE_PENDING"}
-
-# Fetch results later
-dune execution results 01ABC... -o json
-```
-
-**Execution states:** `PENDING` → `EXECUTING` → `COMPLETED` / `FAILED` / `CANCELLED`
 
 ---
 
@@ -126,18 +106,21 @@ mp wallet retrieve --wallet "dune-agent-wallet"
 # Note your Ethereum address for Dune queries
 ```
 
-### Query Your MoonPay Wallet with Dune
+### Query Your MoonPay Wallet On-Chain
 
 ```bash
 WALLET=$(mp wallet retrieve --wallet "dune-agent-wallet" --json | jq -r '.addresses.ethereum')
 
-dune query run-sql --sql "
-  SELECT block_time, hash, value/1e18 AS eth, \"to\", \"from\"
-  FROM ethereum.transactions
-  WHERE lower(\"from\") = lower('$WALLET')
-     OR lower(\"to\") = lower('$WALLET')
-  ORDER BY block_time DESC LIMIT 50
-" -o json
+EXEC_ID=$(curl -s -X POST "https://api.dune.com/api/v1/query/execute" \
+  -H "X-Dune-API-Key: $DUNE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\
+    \"query_sql\": \"SELECT block_time, hash, value/1e18 AS eth, \\\"to\\\" FROM ethereum.transactions WHERE lower(\\\"from\\\") = lower('$WALLET') ORDER BY block_time DESC LIMIT 20\",\
+    \"performance\": \"medium\"\
+  }" | jq -r '.execution_id')
+
+curl -s "https://api.dune.com/api/v1/execution/$EXEC_ID/results" \
+  -H "X-Dune-API-Key: $DUNE_API_KEY" | jq '.result.rows'
 ```
 
 ### Fund the Wallet
@@ -146,40 +129,48 @@ dune query run-sql --sql "
 # Buy ETH for gas
 mp buy --token eth_ethereum --amount 0.1 --wallet <your-eth-address> --email <email>
 
-# Bridge to where the yields are
+# Check balances
+mp token balance list --wallet <your-eth-address> --chain ethereum
+
+# Bridge to follow yields
 mp token bridge \
   --from-wallet dune-agent-wallet --from-chain ethereum \
   --from-token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
   --from-amount 500 \
   --to-chain polygon \
   --to-token 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
-
-# Check balance
-mp token balance list --wallet <your-eth-address> --chain ethereum
 ```
 
 ---
 
-## Limitations
+## Execution States
 
-The following are only available via the Dune MCP server or web UI — **not** via the CLI:
-
-- Visualization creation (charts, counters, tables)
-- Listing all indexed blockchains with table counts
-- Table size analysis
+| State | Meaning |
+|-------|---------|
+| `QUERY_STATE_PENDING` | Queued |
+| `QUERY_STATE_EXECUTING` | Running |
+| `QUERY_STATE_COMPLETED` | Results ready |
+| `QUERY_STATE_FAILED` | Check error message |
+| `QUERY_STATE_CANCELLED` | Cancelled |
 
 ---
 
 ## Security
 
-- Never pass `--api-key` on the command line when others may see terminal history — prefer `dune auth` or `$DUNE_API_KEY`
-- Confirm with the user before running write commands (`query create`, `query update`, `query archive`)
+- Never expose `DUNE_API_KEY` in logs or responses — redact before showing output
+- Confirm with the user before running write operations (creating/updating saved queries)
 
 ---
 
 ## Resources
 
-- **Dune Analytics:** https://dune.com
-- **API docs:** https://docs.dune.com
+- **API docs:** https://docs.dune.com/api-reference/overview/introduction
 - **DuneSQL reference:** https://docs.dune.com/query-engine/Functions-and-operators
+- **Dune Analytics:** https://dune.com
 - **MoonPay CLI:** https://www.npmjs.com/package/@moonpay/cli
+
+## Related Skills
+
+- **moonpay-check-wallet** — Check wallet balances before analyzing on-chain
+- **moonpay-swap-tokens** — Act on findings by swapping tokens
+- **moonpay-bridge-tokens** — Move assets cross-chain informed by your analysis
