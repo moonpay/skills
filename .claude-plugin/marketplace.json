@@ -11,11 +11,10 @@
   "plugins": [
     {
       "name": "moonpay-skills",
-      "description": "Crypto infrastructure skills for AI agents \u2014 wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
+      "description": "Crypto infrastructure skills for AI agents — wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/corbits-marketplace",
         "./skills/moonpay-auth",
         "./skills/moonpay-block-explorer",
         "./skills/moonpay-buy-crypto",
@@ -50,6 +49,15 @@
         "./skills/messari-alpha-scout",
         "./skills/messari-funding-intel",
         "./skills/messari-deep-research"
+      ]
+    },
+    {
+      "name": "corbits-skills",
+      "description": "Paid API marketplace with x402 USDC micropayments via Corbits",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/corbits-marketplace"
       ]
     }
   ]
