@@ -50,6 +50,15 @@
         "./skills/messari-funding-intel",
         "./skills/messari-deep-research"
       ]
+    },
+    {
+      "name": "corbits-skills",
+      "description": "Paid API marketplace with x402 USDC micropayments via Corbits",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/corbits-marketplace"
+      ]
     }
   ]
 }
