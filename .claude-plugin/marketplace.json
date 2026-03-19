@@ -36,6 +36,16 @@
         "./skills/moonpay-virtual-account",
         "./skills/moonpay-x402"
       ]
+    },
+    {
+      "name": "jupiter-skills",
+      "description": "Jupiter DEX aggregator on Solana — swap, lend, perps, limit orders, DCA, token data, and portfolio tracking via Jupiter APIs.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/integrating-jupiter",
+        "./skills/jupiter-lend"
+      ]
     }
   ]
 }
