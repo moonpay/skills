@@ -30,6 +30,7 @@
         "./skills/moonpay-missions",
         "./skills/moonpay-prediction-market",
         "./skills/moonpay-price-alerts",
+        "./skills/moonpay-scout",
         "./skills/moonpay-swap-tokens",
         "./skills/moonpay-trading-automation",
         "./skills/moonpay-upgrade",
