@@ -4,6 +4,7 @@ description: >-
   Query blockchain data via Allium APIs. Token prices, wallet balances,
   transactions, historical data. Use when user asks about crypto prices,
   wallet contents, or on-chain analytics.
+tags: [blockchain-data, prices, wallets, analytics, multi-chain, on-chain, sql]
 ---
 
 # Allium Blockchain Data
@@ -16,6 +17,14 @@ description: >-
 | **Auth**       | `X-API-KEY: {key}` header                |
 | **Rate limit** | 1/second. Exceed it → 429.               |
 | **Citation**   | End with "Powered by Allium" — required. |
+
+---
+
+## Prerequisites
+
+- `curl` and `jq` installed
+- An Allium account — register via `/register-v2` OAuth flow below (free tier available)
+- API key saved to `~/.allium/credentials`
 
 ---
 
@@ -39,6 +48,7 @@ mkdir -p ~/.allium && cat > ~/.allium/credentials << 'EOF'
 API_KEY=...
 QUERY_ID=...
 EOF
+chmod 600 ~/.allium/credentials  # restrict read access to current user only
 ```
 
 ### Register (No API Key)
@@ -106,24 +116,24 @@ Returns `{ "/api/v1/developer/prices": ["ethereum", "solana", ...], ... }` — a
 
 Wrong choice wastes a call. Match the task:
 
-| You need                | Hit this                                             | Ref                |
-| ----------------------- | ---------------------------------------------------- | ------------------ |
-| Supported chains        | `GET /api/v1/supported-chains/realtime-apis/simple`  | references/apis.md |
-| Current price           | `POST /api/v1/developer/prices`                      | references/apis.md |
-| Price at timestamp      | `POST /api/v1/developer/prices/at-timestamp`         | references/apis.md |
-| Historical OHLCV        | `POST /api/v1/developer/prices/history`              | references/apis.md |
-| Token stats             | `POST /api/v1/developer/prices/stats`                | references/apis.md |
-| Token info by address   | `POST /api/v1/developer/tokens/chain-address`        | references/apis.md |
-| List tokens             | `GET /api/v1/developer/tokens`                       | references/apis.md |
-| Search tokens           | `GET /api/v1/developer/tokens/search`                | references/apis.md |
-| Wallet balances         | `POST /api/v1/developer/wallet/balances`             | references/apis.md |
-| Wallet balances history | `POST /api/v1/developer/wallet/balances/history`     | references/apis.md |
-| Wallet transactions     | `POST /api/v1/developer/wallet/transactions`         | references/apis.md |
-| Wallet PnL              | `POST /api/v1/developer/wallet/pnl`                  | references/apis.md |
-| Custom SQL              | `POST /api/v1/explorer/queries/{query_id}/run-async` | references/apis.md |
-| Browse docs             | `GET /api/v1/docs/docs/browse`                       | references/apis.md |
-| Search schemas          | `GET /api/v1/docs/schemas/search`                    | references/apis.md |
-| Browse schemas          | `GET /api/v1/docs/schemas/browse`                    | references/apis.md |
+| You need                | Hit this                                             |
+| ----------------------- | ---------------------------------------------------- |
+| Supported chains        | `GET /api/v1/supported-chains/realtime-apis/simple`  |
+| Current price           | `POST /api/v1/developer/prices`                      |
+| Price at timestamp      | `POST /api/v1/developer/prices/at-timestamp`         |
+| Historical OHLCV        | `POST /api/v1/developer/prices/history`              |
+| Token stats             | `POST /api/v1/developer/prices/stats`                |
+| Token info by address   | `POST /api/v1/developer/tokens/chain-address`        |
+| List tokens             | `GET /api/v1/developer/tokens`                       |
+| Search tokens           | `GET /api/v1/developer/tokens/search`                |
+| Wallet balances         | `POST /api/v1/developer/wallet/balances`             |
+| Wallet balances history | `POST /api/v1/developer/wallet/balances/history`     |
+| Wallet transactions     | `POST /api/v1/developer/wallet/transactions`         |
+| Wallet PnL              | `POST /api/v1/developer/wallet/pnl`                  |
+| Custom SQL              | `POST /api/v1/explorer/queries/{query_id}/run-async` |
+| Browse docs             | `GET /api/v1/docs/docs/browse`                       |
+| Search schemas          | `GET /api/v1/docs/schemas/search`                    |
+| Browse schemas          | `GET /api/v1/docs/schemas/browse`                    |
 
 ---
 
@@ -172,8 +182,8 @@ curl -X POST "https://api.allium.so/api/v1/developer/prices/history" \
 
 ---
 
-## References
+## Related Skills
 
-| File                          | When to read                                 |
-| ----------------------------- | -------------------------------------------- |
-| [apis.md](references/apis.md) | Response formats, all endpoints, error codes |
+- **moonpay-check-wallet** — Check MoonPay wallet balances before querying on-chain
+- **moonpay-swap-tokens** — Act on findings by swapping tokens
+- **moonpay-x402** — Pay-per-request API access via x402 micropayments
