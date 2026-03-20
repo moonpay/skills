@@ -9,6 +9,7 @@ install: >-
   Prerequisites: Python package manager (uv, pip, or pipx).
   Restart your shell after install, then run: allium auth setup
 refetch_after: 30d
+tags: [blockchain-data, prices, wallets, analytics, x402, micropayments, multi-chain]
 ---
 
 # Allium Blockchain Data
@@ -85,3 +86,11 @@ Chain names are **lowercase**: `ethereum`, `base`, `solana`, `arbitrum`, `polygo
 3. **Track spend** — `allium mp cost` shows total spend; `allium mp cost list` for itemized history
 4. **Use `--format json`** — pipe into `jq` for structured post-processing
 5. **Switch profiles** — `allium auth use <name>` to change active auth; `--profile <name>` for one-off overrides
+
+---
+
+## Related Skills
+
+- **moonpay-x402** — x402 micropayment protocol context and wallet setup
+- **moonpay-check-wallet** — Check wallet balances before querying on-chain
+- **allium-onchain-data** — REST API alternative with API key auth (no CLI required)
