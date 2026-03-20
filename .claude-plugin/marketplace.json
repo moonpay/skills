@@ -68,6 +68,46 @@
       "skills": [
         "./skills/corbits-marketplace"
       ]
+    },
+    {
+      "name": "shipp-skills",
+      "description": "Real-time sports data for prediction market agents via Shipp API",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/shipp-sports-data"
+      ]
+    },
+    {
+      "name": "myriad-skills",
+      "description": "BNB Chain prediction market trading via Myriad Markets CLI",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/myriad-prediction-markets"
+      ]
+    },
+    {
+      "name": "messari-skills",
+      "description": "Messari x402 research skills — pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/messari-x402",
+        "./skills/messari-token-research",
+        "./skills/messari-alpha-scout",
+        "./skills/messari-funding-intel",
+        "./skills/messari-deep-research"
+      ]
+    },
+    {
+      "name": "corbits-skills",
+      "description": "Paid API marketplace with x402 USDC micropayments via Corbits",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/corbits-marketplace"
+      ]
     }
   ]
 }
