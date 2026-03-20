@@ -131,7 +131,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/integrating-jupiter",
+        "./skills/jupiter-api",
         "./skills/jupiter-lend"
       ]
     }
