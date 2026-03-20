@@ -86,6 +86,16 @@
       "skills": [
         "./skills/dune-analytics"
       ]
+    },
+    {
+      "name": "allium-skills",
+      "description": "On-chain blockchain data via Allium — prices, wallet balances, transactions, token info, and custom SQL analytics across 40+ chains.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/allium-onchain-data",
+        "./skills/allium-x402"
+      ]
     }
   ]
 }
