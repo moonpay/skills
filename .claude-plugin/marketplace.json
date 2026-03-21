@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "moonpay-skills",
-      "description": "Crypto infrastructure skills for AI agents — wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
+      "description": "Crypto infrastructure skills for AI agents \u2014 wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
       "source": "./",
       "strict": false,
       "skills": [
@@ -35,7 +35,8 @@
         "./skills/moonpay-trading-automation",
         "./skills/moonpay-upgrade",
         "./skills/moonpay-virtual-account",
-        "./skills/moonpay-x402"
+        "./skills/moonpay-x402",
+        "./skills/thoughtproof-reasoning-check"
       ]
     },
     {
@@ -58,7 +59,7 @@
     },
     {
       "name": "messari-skills",
-      "description": "Messari x402 research skills — pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
+      "description": "Messari x402 research skills \u2014 pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
       "source": "./",
       "strict": false,
       "skills": [
@@ -80,7 +81,7 @@
     },
     {
       "name": "dune-skills",
-      "description": "Blockchain analytics via Dune REST API — DuneSQL queries against live on-chain data",
+      "description": "Blockchain analytics via Dune REST API \u2014 DuneSQL queries against live on-chain data",
       "source": "./",
       "strict": false,
       "skills": [
@@ -89,7 +90,7 @@
     },
     {
       "name": "allium-skills",
-      "description": "On-chain blockchain data via Allium — prices, wallet balances, transactions, token info, and custom SQL analytics across 40+ chains.",
+      "description": "On-chain blockchain data via Allium \u2014 prices, wallet balances, transactions, token info, and custom SQL analytics across 40+ chains.",
       "source": "./",
       "strict": false,
       "skills": [
