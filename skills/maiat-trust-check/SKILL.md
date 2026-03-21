@@ -10,6 +10,11 @@ tags: [security, trust, agents, defi]
 
 Before interacting with any agent or token, check its trust score via Maiat. Returns a verdict (proceed/caution/avoid) based on behavioral analysis, completion rates, and on-chain history.
 
+## Prerequisites
+
+- MoonPay CLI installed: `npm install -g @moonpay/cli`
+- A funded wallet on Base (for x402 paid endpoints): `mp wallet create`
+
 ## Free API (no payment required)
 
 ```bash

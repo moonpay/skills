@@ -96,6 +96,16 @@
         "./skills/allium-onchain-data",
         "./skills/allium-x402"
       ]
+    },
+    {
+      "name": "maiat-skills",
+      "description": "Trust verification and token safety checks for AI agents via Maiat Protocol",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/maiat-trust-check",
+        "./skills/maiat-token-safety"
+      ]
     }
   ]
 }

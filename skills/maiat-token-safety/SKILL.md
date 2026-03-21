@@ -10,6 +10,11 @@ tags: [security, defi, tokens]
 
 Before swapping or buying any ERC-20 token, verify it's not a honeypot, high-tax scam, or rug pull.
 
+## Prerequisites
+
+- MoonPay CLI installed: `npm install -g @moonpay/cli`
+- A funded wallet on Base (for x402 paid endpoints): `mp wallet create`
+
 ## Free API
 
 ```bash
