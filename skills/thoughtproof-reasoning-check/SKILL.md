@@ -97,4 +97,4 @@ For maximum safety before any high-value trade:
 4. moonpay-swap-tokens   → Execute with confidence
 ```
 
-Maiat and ThoughtProof are complementary — Maiat checks the agent's reputation over time, ThoughtProof checks whether this specific decision is well-reasoned right now. Both are needed for full coverage.
+Maiat and ThoughtProof are complementary — Maiat checks the agent's reputation over time, ThoughtProof checks whether this specific decision is well-reasoned right now. Run each step manually or chain them in your agent workflow for full coverage.
