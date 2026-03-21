@@ -82,15 +82,19 @@ If payment is required first:
 
 ## Related skills
 
-- **maiat-trust-check** — Behavioral trust score (is the agent reliable?)
-- **maiat-token-safety** — Honeypot and rug pull detection (is the token safe?)
-- **moonpay-swap-tokens** — Execute the swap after verification passes
+- **maiat-trust-check** — Behavioral trust score from 29,000+ indexed agents. Run this first — it answers "is this agent reliable based on past behavior?" ThoughtProof then answers "is this specific decision sound?"
+- **maiat-token-safety** — Honeypot and rug pull detection before any token interaction
+- **moonpay-swap-tokens** — Execute the swap after all verification passes
 
-## Stack
+## Recommended stack
 
-Maiat checks trust. ThoughtProof checks reasoning. Together: safe agent commerce.
+For maximum safety before any high-value trade:
 
-1. maiat-trust-check → Is the agent trustworthy?
-2. maiat-token-safety → Is the token safe?
-3. **thoughtproof-reasoning-check → Is the decision well-reasoned?**
-4. moonpay-swap-tokens → Execute with confidence
+```
+1. maiat-trust-check     → Is the agent trustworthy? (behavioral history)
+2. maiat-token-safety    → Is the token safe? (rug/honeypot)
+3. thoughtproof-reasoning-check → Is the decision sound? (reasoning quality)
+4. moonpay-swap-tokens   → Execute with confidence
+```
+
+Maiat and ThoughtProof are complementary — Maiat checks the agent's reputation over time, ThoughtProof checks whether this specific decision is well-reasoned right now. Both are needed for full coverage.
