@@ -13,7 +13,7 @@ Before swapping or buying any ERC-20 token, verify it's not a honeypot, high-tax
 ## Free API
 
 ```bash
-curl "https://app.maiat.io/api/v1/token-check?token=<contract_address>"
+curl "https://app.maiat.io/api/v1/token/<contract_address>"
 ```
 
 ## x402 Paid API ($0.01 USDC on Base)
@@ -22,7 +22,7 @@ Using MoonPay CLI:
 ```bash
 mp x402 request \
   --method GET \
-  --url "https://app.maiat.io/api/x402/token-check?token=<contract_address>" \
+  --url "https://app.maiat.io/api/x402/token-check?address=<contract_address>" \
   --wallet <wallet-name> \
   --chain base
 ```
@@ -31,21 +31,34 @@ mp x402 request \
 
 ```json
 {
-  "safe": true,
+  "address": "0x...",
   "verdict": "proceed",
-  "honeypot": false,
-  "highTax": false,
-  "verified": true
+  "trustScore": 85,
+  "riskFlags": [],
+  "riskSummary": "Token appears safe based on analysis."
 }
 ```
 
+## Verdict meanings
+
+| Verdict | Meaning | Action |
+|---------|---------|--------|
+| `trusted` | Verified safe token (e.g. USDC, WETH) | Safe to swap |
+| `proceed` | No major red flags detected | Safe to swap |
+| `caution` | Some risk signals present | Proceed with small amounts |
+| `avoid` | High risk — honeypot or scam likely | Do not swap |
+
 ## Risk flags
+
+Common `riskFlags` values:
 
 | Flag | Meaning |
 |------|---------|
-| `honeypot: true` | Cannot sell after buying — **do not buy** |
-| `highTax: true` | Buy/sell tax > 10% — likely scam |
-| `verified: false` | Contract not verified on explorer |
+| `HONEYPOT_DETECTED` | Cannot sell after buying — **do not buy** |
+| `HIGH_BUY_TAX` | Buy tax > 25% |
+| `HIGH_SELL_TAX` | Sell tax > 25% |
+| `NEAR_ZERO_LIQUIDITY` | Liquidity too low to trade safely |
+| `UNVERIFIED` | Contract simulation failed |
 
 ## Deep forensics ($0.05)
 
@@ -55,7 +68,7 @@ For suspicious tokens, run Wadjet ML analysis:
 mp x402 request \
   --method POST \
   --url "https://app.maiat.io/api/x402/token-forensics" \
-  --body '{"token": "<contract_address>"}' \
+  --body '{"projectName": "<token_name>"}' \
   --wallet <wallet-name> \
   --chain base
 ```

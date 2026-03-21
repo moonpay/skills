@@ -1,6 +1,6 @@
 ---
 name: maiat-trust-check
-description: Check if an agent or token is trustworthy before transacting. Returns trust score and verdict from 18,600+ indexed agents on Base. Use before any swap, transfer, or agent interaction.
+description: Check if an agent or token is trustworthy before transacting. Returns trust score and verdict from 29,000+ indexed agents on Base. Use before any swap, transfer, or agent interaction.
 tags: [security, trust, agents, defi]
 ---
 
@@ -31,28 +31,34 @@ mp x402 request \
 
 ```json
 {
+  "address": "0x...",
+  "type": "agent",
   "trustScore": 85,
   "verdict": "proceed",
   "summary": "Reliable ACP agent — 42 jobs, 95% completion",
-  "completionRate": 0.95,
-  "totalJobs": 42
+  "learnMore": "GET /api/v1/agent/0x..."
 }
 ```
+
+`type` is `"agent"`, `"token"`, or `"unknown"`.
+
+For full behavioral breakdown (completion rate, job history, etc.), use the paid `/api/x402/reputation` endpoint.
 
 ## Decision logic
 
 | Score | Verdict | Action |
 |-------|---------|--------|
-| 80-100 | `proceed` | Safe to interact |
+| 80-100 | `trusted` / `proceed` | Safe to interact |
 | 60-79 | `caution` | Proceed with lower amounts |
 | 0-59 | `avoid` | Do not interact |
+| — | `unknown` | No data — treat as unverified |
 
 ## Example workflow
 
 1. User says: "Swap 100 USDC for TOKEN_X"
 2. Check trust: `curl https://app.maiat.io/api/v1/trust?address=<TOKEN_X_ADDRESS>`
-3. If `avoid` → warn user, do not proceed
-4. If `proceed` → execute the swap
+3. If `avoid` or `unknown` → warn user, do not proceed
+4. If `proceed` or `trusted` → execute the swap
 
 ## Related skills
 
