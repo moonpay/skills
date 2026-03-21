@@ -106,6 +106,15 @@
         "./skills/maiat-trust-check",
         "./skills/maiat-token-safety"
       ]
+    },
+    {
+      "name": "thoughtproof-skills",
+      "description": "Adversarial multi-model reasoning verification for AI agents before trades execute, via x402 micropayments on Base.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/thoughtproof-reasoning-check"
+      ]
     }
   ]
 }
