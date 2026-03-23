@@ -8,7 +8,7 @@ tags: [alerts, research]
 
 ## Goal
 
-Monitor token prices and get desktop notifications when they cross a threshold. Uses `mp token retrieve` for price checks and OS notifications (`osascript`/`notify-send`) for alerts. Observe-only — no funds at risk.
+Monitor token prices and get desktop notifications when they cross a threshold. Uses `mp token search` for price checks and OS notifications (`osascript`/`notify-send`) for alerts. Observe-only — no funds at risk.
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ DIRECTION="below"  # "above" or "below"
 SCRIPT_NAME="alert-sol-below-80"
 
 # --- Check price ---
-PRICE=$("$MP" -f compact token retrieve --token "$TOKEN" --chain "$CHAIN" | jq -r '.marketData.price')
+PRICE=$("$MP" --json token search --query "$SYMBOL" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
 if [ -z "$PRICE" ] || [ "$PRICE" = "null" ]; then
   log "ALERT $SCRIPT_NAME: price fetch failed, skipping"
@@ -152,7 +152,7 @@ tail -50 ~/.config/moonpay/logs/alerts.log
 
 ## Tips
 
-- Price checks via `mp token retrieve` are free — no gas costs
+- Price checks via `mp token search` are free — no gas costs
 - 5-minute intervals are reasonable; don't go below 1 minute
 - Use `mp token search --query "SOL" --chain solana` to resolve token addresses
 - Alerts log to `~/.config/moonpay/logs/alerts.log` — check this to verify they're running

@@ -143,7 +143,7 @@ mp prediction-market position sell --wallet main --provider polymarket --tokenId
 
 ## Tips
 
-- Use `mp -f json prediction-market ...` for programmatic output
+- Use `mp --json prediction-market ...` for programmatic output
 - Markets with higher volume and liquidity have tighter spreads
 - Check `acceptingOrders` — closed markets cannot be traded
 - `negRisk` markets use a different settlement framework — the CLI handles this automatically
