@@ -40,7 +40,7 @@ DIRECTION="below"  # "above" or "below"
 SCRIPT_NAME="alert-sol-below-80"
 
 # --- Check price ---
-PRICE=$("$MP" -f compact token retrieve --token "$TOKEN" --chain "$CHAIN" | jq -r '.marketData.price')
+PRICE=$("$MP" --json token search --query "$SYMBOL" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
 if [ -z "$PRICE" ] || [ "$PRICE" = "null" ]; then
   log "ALERT $SCRIPT_NAME: price fetch failed, skipping"
