@@ -123,8 +123,8 @@ mp virtual-account kyc continue
 mp virtual-account bank-account register
 mp virtual-account onramp create \
   --name "Corbits Onramp" \
-  --fiat USD \
-  --stablecoin USDC \
+  --fiat usd \
+  --stablecoin usdc \
   --wallet <evm-address> \
   --chain ethereum
 ```
