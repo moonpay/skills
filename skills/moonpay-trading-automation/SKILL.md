@@ -51,7 +51,7 @@ log "OK: $RESULT"
 ```
 
 Key points:
-- `mp --json` outputs JSON, ideal for `jq` parsing
+- `mp --json` outputs single-line JSON, ideal for `jq` parsing
 - Use `$(which mp)` and store as `MP` — cron/launchd have minimal PATH
 - Wallet names only in scripts — `mp` handles keychain decryption at runtime
 - If the user gives token names/symbols, resolve to addresses first with `mp token search`
@@ -131,14 +131,13 @@ log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*" >> "$LOG"; }
 WALLET="main"
 CHAIN="solana"
 TOKEN="So11111111111111111111111111111111111111111"
-SYMBOL="SOL"
 BUY_WITH="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # USDC
 BUY_AMOUNT=50
 TARGET_PRICE=80
 SCRIPT_NAME="limit-buy-sol"
 
 # --- Check price ---
-PRICE=$("$MP" --json token search --query "$SYMBOL" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
+PRICE=$("$MP" --json token search --query "$TOKEN" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
 if [ -z "$PRICE" ] || [ "$PRICE" = "null" ]; then
   log "LIMIT $SCRIPT_NAME: price fetch failed, skipping"
@@ -182,13 +181,12 @@ Same structure as limit order but sells instead of buys. For "sell all", query t
 ```bash
 # --- Config ---
 SELL_TOKEN="So11111111111111111111111111111111111111111"   # SOL
-SELL_SYMBOL="SOL"
 TO_TOKEN="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" # USDC
 TRIGGER_PRICE=70
 SCRIPT_NAME="stop-loss-sol"
 
 # --- Check price ---
-PRICE=$("$MP" --json token search --query "$SELL_SYMBOL" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
+PRICE=$("$MP" --json token search --query "$SELL_TOKEN" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
 if (( $(echo "$PRICE < $TRIGGER_PRICE" | bc -l) )); then
   # Get current balance to sell all
