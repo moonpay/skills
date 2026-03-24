@@ -122,7 +122,11 @@ mp virtual-account create
 mp virtual-account kyc continue
 mp virtual-account bank-account register
 mp virtual-account onramp create \
-  --amount 500 --currency usd --chain ethereum --wallet <evm-address>
+  --name "Corbits Onramp" \
+  --fiat USD \
+  --stablecoin USDC \
+  --wallet <evm-address> \
+  --chain ethereum
 ```
 
 ### Deposit Link (Permissionless)
