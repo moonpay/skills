@@ -123,7 +123,7 @@ mp virtual-account offramp create \
   --amount 500 --chain polygon --wallet <polygon-address>
 
 # Hardware wallet (high security)
-mp wallet add-ledger --name "shipp-sports-ledger"
+mp wallet hardware add --name "shipp-sports-ledger"
 ```
 
 ## Funding Options
