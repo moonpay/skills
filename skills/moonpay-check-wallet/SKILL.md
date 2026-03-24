@@ -51,7 +51,7 @@ Bitcoin uses a separate command: `mp bitcoin balance retrieve --wallet <btc-addr
 
 ## Output formats
 
-Use `mp -f table token balance list ...` for a quick table view, or `mp -f json ...` for programmatic processing.
+Use `mp --json token balance list ...` for programmatic processing.
 
 ## Related skills
 

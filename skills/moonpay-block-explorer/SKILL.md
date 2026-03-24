@@ -41,7 +41,7 @@ xdg-open "https://etherscan.io/tx/0xabcd..."
 `mp token swap` and `mp token bridge` return a result with the transaction signature. Use the chain to pick the correct explorer.
 
 ```bash
-RESULT=$(mp -f compact token swap --wallet main --chain solana \
+RESULT=$(mp --json token swap --wallet main --chain solana \
   --from-token EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v \
   --from-amount 1 \
   --to-token So11111111111111111111111111111111111111111)
@@ -57,8 +57,8 @@ open "https://solscan.io/tx/$SIG"
 
 ```bash
 # View most recent transaction
-TX=$(mp -f compact transaction list --wallet <addr> | jq -r '.items[0].from.txHash')
-CHAIN=$(mp -f compact transaction list --wallet <addr> | jq -r '.items[0].from.chain')
+TX=$(mp --json transaction list --wallet <addr> | jq -r '.items[0].from.txHash')
+CHAIN=$(mp --json transaction list --wallet <addr> | jq -r '.items[0].from.chain')
 # Build URL from chain → explorer table above
 ```
 
@@ -95,7 +95,7 @@ Get token addresses from: `mp token search --query "USDC" --chain solana`
 `mp buy` returns a checkout URL. Open it directly:
 
 ```bash
-URL=$(mp -f compact buy --token sol --amount 1 --wallet <addr> --email <email> | jq -r '.url')
+URL=$(mp --json buy --token sol --amount 1 --wallet <addr> --email <email> | jq -r '.url')
 open "$URL"
 ```
 

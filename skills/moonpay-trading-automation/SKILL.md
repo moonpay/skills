@@ -40,7 +40,7 @@ AMOUNT=5
 
 # --- Execute ---
 log "SWAP: $AMOUNT $FROM_TOKEN -> $TO_TOKEN on $CHAIN"
-RESULT=$("$MP" -f compact token swap \
+RESULT=$("$MP" --json token swap \
   --wallet "$WALLET" --chain "$CHAIN" \
   --from-token "$FROM_TOKEN" --from-amount "$AMOUNT" \
   --to-token "$TO_TOKEN" 2>&1) || {
@@ -51,7 +51,7 @@ log "OK: $RESULT"
 ```
 
 Key points:
-- `mp -f compact` outputs single-line JSON, ideal for `jq` parsing
+- `mp --json` outputs single-line JSON, ideal for `jq` parsing
 - Use `$(which mp)` and store as `MP` — cron/launchd have minimal PATH
 - Wallet names only in scripts — `mp` handles keychain decryption at runtime
 - If the user gives token names/symbols, resolve to addresses first with `mp token search`
@@ -137,7 +137,7 @@ TARGET_PRICE=80
 SCRIPT_NAME="limit-buy-sol"
 
 # --- Check price ---
-PRICE=$("$MP" -f compact token retrieve --token "$TOKEN" --chain "$CHAIN" | jq -r '.marketData.price')
+PRICE=$("$MP" --json token search --query "$TOKEN" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
 if [ -z "$PRICE" ] || [ "$PRICE" = "null" ]; then
   log "LIMIT $SCRIPT_NAME: price fetch failed, skipping"
@@ -147,7 +147,7 @@ fi
 # --- Compare ---
 if (( $(echo "$PRICE < $TARGET_PRICE" | bc -l) )); then
   log "LIMIT $SCRIPT_NAME: price $PRICE < $TARGET_PRICE — executing buy"
-  RESULT=$("$MP" -f compact token swap \
+  RESULT=$("$MP" --json token swap \
     --wallet "$WALLET" --chain "$CHAIN" \
     --from-token "$BUY_WITH" --from-amount "$BUY_AMOUNT" \
     --to-token "$TOKEN" 2>&1) || {
@@ -186,16 +186,16 @@ TRIGGER_PRICE=70
 SCRIPT_NAME="stop-loss-sol"
 
 # --- Check price ---
-PRICE=$("$MP" -f compact token retrieve --token "$SELL_TOKEN" --chain "$CHAIN" | jq -r '.marketData.price')
+PRICE=$("$MP" --json token search --query "$SELL_TOKEN" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
 if (( $(echo "$PRICE < $TRIGGER_PRICE" | bc -l) )); then
   # Get current balance to sell all
-  BALANCE=$("$MP" -f compact token balance list --wallet "$WALLET" --chain "$CHAIN" \
+  BALANCE=$("$MP" --json token balance list --wallet "$WALLET" --chain "$CHAIN" \
     | jq -r --arg addr "$SELL_TOKEN" '.items[] | select(.address == $addr) | .balance.amount')
 
   if [ -n "$BALANCE" ] && (( $(echo "$BALANCE > 0" | bc -l) )); then
     log "STOP-LOSS $SCRIPT_NAME: price $PRICE < $TRIGGER_PRICE — selling $BALANCE"
-    RESULT=$("$MP" -f compact token swap \
+    RESULT=$("$MP" --json token swap \
       --wallet "$WALLET" --chain "$CHAIN" \
       --from-token "$SELL_TOKEN" --from-amount "$BALANCE" \
       --to-token "$TO_TOKEN" 2>&1) || {
@@ -262,7 +262,7 @@ fi
 - Check logs after the first run: `tail -20 ~/.config/moonpay/logs/trading.log`
 - Scripts don't contain secrets — `mp` decrypts wallets via OS keychain at runtime
 - The machine must be logged in (user session active) for keychain access to work
-- Price checks via `mp token retrieve` are free; swaps cost gas
+- Price checks via `mp token search` are free; swaps cost gas
 - Limit order checks every 5 minutes is reasonable — don't go below 1 minute
 - Use `bc -l` for decimal price comparison (bash can't compare floats natively)
 - If `bc` isn't available, use: `awk "BEGIN {exit !($PRICE < $TARGET)}"`

@@ -25,7 +25,7 @@ mkdir -p ~/Documents/moonpay
 # Header + data
 echo "symbol,name,amount,usd_value,price" > ~/Documents/moonpay/portfolio-$(date +%Y%m%d).csv
 
-mp -f compact token balance list --wallet <address> --chain solana \
+mp --json token balance list --wallet <address> --chain solana \
   | jq -r '.items[] | [.symbol, .name, .balance.amount, .balance.value, .balance.price] | @csv' \
   >> ~/Documents/moonpay/portfolio-$(date +%Y%m%d).csv
 ```
@@ -39,7 +39,7 @@ FILE=~/Documents/moonpay/portfolio-$(date +%Y%m%d).csv
 echo "chain,symbol,name,amount,usd_value,price" > "$FILE"
 
 for CHAIN in solana ethereum base polygon arbitrum; do
-  mp -f compact token balance list --wallet <address> --chain "$CHAIN" \
+  mp --json token balance list --wallet <address> --chain "$CHAIN" \
     | jq -r --arg chain "$CHAIN" '.items[] | [$chain, .symbol, .name, .balance.amount, .balance.value, .balance.price] | @csv' \
     >> "$FILE" 2>/dev/null
 done
@@ -55,7 +55,7 @@ Export swap and bridge history. These are transactions executed via the CLI and 
 echo "date,type,from_chain,from_token,from_amount,to_chain,to_token,to_amount,usd,status" \
   > ~/Documents/moonpay/transactions-$(date +%Y%m%d).csv
 
-mp -f compact transaction list --wallet <address> \
+mp --json transaction list --wallet <address> \
   | jq -r '.items[] | [
       .transactionId,
       .type,
@@ -70,7 +70,7 @@ mp -f compact transaction list --wallet <address> \
 ### Filter by chain
 
 ```bash
-mp -f compact transaction list --wallet <address> --chain solana \
+mp --json transaction list --wallet <address> --chain solana \
   | jq -r '.items[] | ...' >> transactions.csv
 ```
 
@@ -79,7 +79,7 @@ mp -f compact transaction list --wallet <address> --chain solana \
 For structured data or programmatic use:
 
 ```bash
-mp -f compact token balance list --wallet <address> --chain solana \
+mp --json token balance list --wallet <address> --chain solana \
   | jq '.items | map({symbol, amount: .balance.amount, usd: .balance.value})' \
   > ~/Documents/moonpay/portfolio-$(date +%Y%m%d).json
 ```
