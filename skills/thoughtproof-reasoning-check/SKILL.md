@@ -96,5 +96,3 @@ This gives the agent stack two layers:
 ## Related skills
 
 - **moonpay-swap-tokens** — Execute the swap after verification passes
-
-  
