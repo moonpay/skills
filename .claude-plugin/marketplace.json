@@ -36,6 +36,15 @@
         "./skills/moonpay-virtual-account",
         "./skills/moonpay-x402"
       ]
+    },
+    {
+      "name": "nansen-skills",
+      "description": "Nansen on-chain analytics — smart money DCA tracking, wallet labels, token flow intelligence, and whale activity on Solana.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/nansen-dca-tracker"
+      ]
     }
   ]
 }
