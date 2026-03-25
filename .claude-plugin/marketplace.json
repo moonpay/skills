@@ -124,6 +124,43 @@
       "skills": [
         "./skills/zerion-wallet-data"
       ]
+    },
+    {
+      "name": "nansen-skills",
+      "description": "Nansen on-chain analytics — smart money tracking, wallet profiling, token research, DeFi positions, cross-chain flows, prediction markets, and more.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/nansen-defi-positions",
+        "./skills/nansen-exit-signals",
+        "./skills/nansen-fund-tracker",
+        "./skills/nansen-general-search",
+        "./skills/nansen-holder-analysis",
+        "./skills/nansen-perp-screener",
+        "./skills/nansen-perp-trader-profile",
+        "./skills/nansen-polymarket-deep-dive",
+        "./skills/nansen-polymarket-insider-scan",
+        "./skills/nansen-polymarket-trader-profile",
+        "./skills/nansen-portfolio-tracker",
+        "./skills/nansen-prediction-markets",
+        "./skills/nansen-sm-cross-chain-flows",
+        "./skills/nansen-smart-alerts",
+        "./skills/nansen-smart-money-alpha",
+        "./skills/nansen-smart-money-tracker",
+        "./skills/nansen-smart-money-trend",
+        "./skills/nansen-token-research",
+        "./skills/nansen-token-screener",
+        "./skills/nansen-token-transfer-analysis",
+        "./skills/nansen-trading",
+        "./skills/nansen-wallet-batch",
+        "./skills/nansen-wallet-clustering",
+        "./skills/nansen-wallet-deep-dive",
+        "./skills/nansen-wallet-keychain-migration",
+        "./skills/nansen-wallet-manager",
+        "./skills/nansen-wallet-profiler",
+        "./skills/nansen-web-fetcher",
+        "./skills/nansen-web-searcher"
+      ]
     }
   ]
 }
