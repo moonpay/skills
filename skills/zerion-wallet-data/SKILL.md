@@ -183,7 +183,7 @@ zerion-cli wallet pnl <address>
 zerion-cli chains list
 ```
 
-Auth via API key (`ZERION_API_KEY` env var) or x402 (`WALLET_PRIVATE_KEY` env var with `--x402` flag). Get an API key at [dashboard.zerion.io](https://dashboard.zerion.io).
+Auth via API key (`ZERION_API_KEY` env var) or x402 pay-per-call (`ZERION_X402=true` env var, or `--x402` flag). Get an API key at [dashboard.zerion.io](https://dashboard.zerion.io).
 
 ---
 
