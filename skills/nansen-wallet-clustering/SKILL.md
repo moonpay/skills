@@ -43,4 +43,3 @@ nansen research profiler trace --address $ADDR --chain $CHAIN --depth 2 --width 
 **Expansion:** Run steps 1-2 on seed. For each new address found, ask the human before querying. Reserve step 3 for seed only.
 **Stop when:** known protocol/CEX · Low confidence · already visited · cluster > 10 wallets.
 **Confidence:** High = first funder / shared Safe signers / same CEX deposit. Medium = coordinated movements / related-wallets + label match. Exclude = ENS only, single CEX withdrawal, single deployer.
-Full attribution rules in REFERENCE.md.
