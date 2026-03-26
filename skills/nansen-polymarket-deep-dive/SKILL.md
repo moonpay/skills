@@ -20,7 +20,7 @@ allowed-tools: Bash(nansen:*)
 
 **Answers:** "What's happening in this specific market? Who holds it, who's trading it?"
 
-Use `market_id` from the screener (`nansen-prediction-market` skill).
+Use `market_id` from the screener (`nansen-prediction-markets` skill).
 
 ```bash
 MID=<market_id>
