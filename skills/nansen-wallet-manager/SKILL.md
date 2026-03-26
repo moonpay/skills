@@ -170,7 +170,7 @@ nansen wallet forget-password
 nansen wallet secure
 ```
 
-For detailed migration steps (from `~/.nansen/.env`, `.credentials`, or env-var-only setups), see the **nansen-wallet-migration** skill.
+For detailed migration steps (from `~/.nansen/.env`, `.credentials`, or env-var-only setups), see the **nansen-wallet-keychain-migration** skill.
 
 ## Flags
 
