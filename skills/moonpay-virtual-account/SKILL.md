@@ -139,7 +139,7 @@ mp virtual-account bank-account delete --bankAccountId <id>
 # Create an offramp
 mp virtual-account offramp create \
   --name "My Offramp" \
-  --fiat USD \
+  --bankAccountId <bank-account-id> \
   --stablecoin USDC \
   --chain solana
 

@@ -119,10 +119,14 @@ mp token swap \
 
 ```bash
 mp virtual-account create
-mp virtual-account kyc submit
-mp virtual-account bank-account add
+mp virtual-account kyc continue
+mp virtual-account bank-account register
 mp virtual-account onramp create \
-  --amount 500 --currency usd --chain ethereum --wallet <evm-address>
+  --name "Corbits Onramp" \
+  --fiat usd \
+  --stablecoin usdc \
+  --wallet <evm-address> \
+  --chain ethereum
 ```
 
 ### Deposit Link (Permissionless)
