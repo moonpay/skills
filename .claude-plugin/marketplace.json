@@ -115,6 +115,15 @@
       "skills": [
         "./skills/thoughtproof-reasoning-check"
       ]
+    },
+    {
+      "name": "zerion-skills",
+      "description": "Interpreted wallet data for AI agents via x402 — portfolios, DeFi positions, PnL, transactions, NFTs across 40+ chains and Solana. $0.01 USDC per request on Base.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/zerion-wallet-data"
+      ]
     }
   ]
 }
