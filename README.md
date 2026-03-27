@@ -97,6 +97,7 @@ See the [moonpay-mcp](skills/moonpay-mcp/SKILL.md) skill for setup details.
 |-------|-------------|
 | [corbits-marketplace](skills/corbits-marketplace/) | Paid API marketplace with x402 micropayments |
 | [myriad-prediction-markets](skills/myriad-prediction-markets/) | BNB Chain prediction market trading |
+| [zerion-wallet-data](skills/zerion-wallet-data/) | Interpreted on-chain wallet data via x402 — portfolios, DeFi positions, PnL, transactions, NFTs |
 
 ## Contributing
 
