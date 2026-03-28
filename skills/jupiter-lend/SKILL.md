@@ -22,6 +22,8 @@ npm install @jup-ag/lend @jup-ag/lend-read @solana/web3.js
 ```
 
 > ⚠️ **Security:** Never expose your private key in code or logs. Load it from an environment variable or a secure keyfile with restricted permissions (`chmod 600`).
+>
+> ⚠️ **License:** `@jup-ag/lend-read` is published under a **Proprietary** license. Review the license terms before use in production or commercial applications.
 
 ---
 
@@ -36,9 +38,10 @@ Use `@jup-ag/lend-read` to query markets, pools, and positions without signing.
 | `getLendingMarkets()` | All lending markets and their APYs |
 | `getLendingPool(mint)` | Pool details for a specific token |
 | `getUserPosition(wallet)` | Current deposits and borrows for a wallet |
-| `getjlTokenInfo(mint)` | jlToken (receipt token) metadata |
+| `getJlTokenInfo(mint)` | jlToken (receipt token) metadata |
 
-**Full SDK docs:** https://github.com/jup-ag/jup-lock
+**SDK reference:** https://www.npmjs.com/package/@jup-ag/lend-read
+**Jupiter docs:** https://dev.jup.ag
 
 ---
 
@@ -55,8 +58,7 @@ Use `@jup-ag/lend-read` to query markets, pools, and positions without signing.
 
 Each method returns an unsigned Solana transaction. Sign and send with your wallet.
 
-**Full SDK reference:** https://github.com/jup-ag/jup-lock
-**npm:** https://www.npmjs.com/package/@jup-ag/lend
+**SDK reference:** https://www.npmjs.com/package/@jup-ag/lend
 
 ---
 
