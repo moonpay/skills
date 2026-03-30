@@ -89,38 +89,52 @@ Full protocol documentation: https://www.alchemy.com/docs
 ## x402 Workflow
 
 1. **Bootstrap wallet** — create a wallet and fund it with USDC
-2. **Generate SIWE/SIWS token** — sign a message proving wallet ownership
-3. **Make a request** — send request to `https://x402.alchemy.com/{chainNetwork}/v2`
-4. **Handle 402** — if server returns 402 with `PAYMENT-REQUIRED` header, run `npx @alchemy/x402 pay` with the challenge
-5. **Retry** — resend the request with `Payment-Signature: <base64>` header
+2. **Generate SIWE/SIWS auth token** — sign a message proving wallet ownership
+3. **Make a request** — send to `https://x402.alchemy.com/{chainNetwork}/v2` with `Authorization: SIWE <token>`
+4. **Handle 402** — if server returns 402 with `PAYMENT-REQUIRED` header, run `npx @alchemy/x402 pay` and extract the `Payment-Signature`
+5. **Retry** — resend the original request adding `Payment-Signature: <base64>` header
 
 ```bash
 # Install x402 client
 npm install -g @alchemy/x402 @x402/fetch
 
-# Make a request (x402 client handles auth + payment automatically)
-npx @alchemy/x402 request \
-  --url "https://x402.alchemy.com/eth-mainnet/v2" \
-  --method eth_blockNumber
+# Step 1: Generate a SIWE auth token for your EVM wallet
+SIWE_TOKEN=$(npx @alchemy/x402 sign-siwe --domain x402.alchemy.com)
+
+# Step 2: Make a request (will return 402 on first call)
+curl -s -X POST "https://x402.alchemy.com/eth-mainnet/v2" \
+  -H "Authorization: SIWE $SIWE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_blockNumber","params":[]}'
+
+# Step 3: If 402 received, pay the challenge and retry with Payment-Signature
+# npx @alchemy/x402 pay  (pass the PAYMENT-REQUIRED header value)
 ```
 
 ---
 
 ## MPP Workflow
 
-1. **Bootstrap wallet** — create a wallet and fund it with USDC or link a Stripe card
-2. **Generate SIWE token** — sign a message proving EVM wallet ownership
-3. **Create MPP credential** — run `mppx auth` to get a payment credential
-4. **Make a request** — send to `https://mpp.alchemy.com/{chainNetwork}/v2` with `Authorization: Payment <credential>`
-5. **Handle 402** — if server returns 402 with `WWW-Authenticate`, refresh credential and retry
+1. **Bootstrap wallet** — create an account and fund it with USDC or link a Stripe card
+2. **Make a request** — `mppx` handles SIWE auth and MPP payment automatically
+3. **Handle 402** — `mppx` intercepts 402 responses and pays the challenge transparently
 
 ```bash
 # Install mppx
 npm install -g mppx
 
-# Authenticate and make a request
-mppx auth
-mppx request --url "https://mpp.alchemy.com/eth-mainnet/v2" --method eth_blockNumber
+# Create an account (one-time setup)
+mppx account create
+
+# Fund the account
+mppx account fund
+
+# Make an authenticated + paid request (mppx handles auth and payment)
+mppx "https://mpp.alchemy.com/eth-mainnet/v2" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_blockNumber","params":[]}'
+
+# View account details
+mppx account view
 ```
 
 ---
