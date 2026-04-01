@@ -66,10 +66,10 @@ Each method returns an unsigned Solana transaction. Sign and send with your wall
 
 ```bash
 # Buy USDC on Solana to deposit into Jupiter Lend
-mp buy --token usdc_solana --amount 100 --wallet <your-solana-address> --email <email>
+mp buy --token usdc_sol --amount 100 --wallet <your-solana-address> --email <email>
 
 # Buy SOL for gas
-mp buy --token sol_solana --amount 0.1 --wallet <your-solana-address> --email <email>
+mp buy --token sol --amount 0.1 --wallet <your-solana-address> --email <email>
 ```
 
 ---

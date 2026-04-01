@@ -217,10 +217,10 @@ curl -H "x-api-key: $JUPITER_API_KEY" \
 
 ```bash
 # Buy SOL for gas and trading
-mp buy --token sol_solana --amount 0.5 --wallet <your-solana-address> --email <email>
+mp buy --token sol --amount 0.5 --wallet <your-solana-address> --email <email>
 
 # Buy USDC on Solana for DCA or limit orders
-mp buy --token usdc_solana --amount 100 --wallet <your-solana-address> --email <email>
+mp buy --token usdc_sol --amount 100 --wallet <your-solana-address> --email <email>
 
 # Check balance
 mp token balance list --wallet <your-solana-address> --chain solana
