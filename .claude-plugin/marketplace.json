@@ -115,6 +115,18 @@
       "skills": [
         "./skills/thoughtproof-reasoning-check"
       ]
+    },
+    {
+      "name": "dawn-skills",
+      "description": "Local prediction market trading strategies via Dawn CLI — research Polymarket markets with SDK tools, generate Python strategy scripts, run background strategy processes, and manage positions.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/dawn",
+        "./skills/dawn-auth",
+        "./skills/dawn-strategy",
+        "./skills/dawn-sdk-tools"
+      ]
     }
   ]
 }
