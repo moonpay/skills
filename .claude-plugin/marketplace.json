@@ -115,6 +115,29 @@
       "skills": [
         "./skills/thoughtproof-reasoning-check"
       ]
+    },
+    {
+      "name": "dawn-skills",
+      "description": "Local prediction market trading strategies via Dawn CLI — research Polymarket markets with SDK tools, generate Python strategy scripts, run background strategy processes, and manage positions.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/dawn",
+        "./skills/dawn-auth",
+        "./skills/dawn-strategy",
+        "./skills/dawn-sdk-tools"
+      ]
+    },
+    {
+      "name": "perp-skills",
+      "description": "Perpetual futures trading across Hyperliquid, Pacifica, Lighter, and Aster — execute trades, run TWAP/DCA/grid bots, scan funding rate arbitrage, and view multi-exchange portfolio.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/perp-trade",
+        "./skills/perp-arb",
+        "./skills/perp-portfolio"
+      ]
     }
   ]
 }
