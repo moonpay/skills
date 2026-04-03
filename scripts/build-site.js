@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
  * Reads all SKILL.md files + marketplace.json and generates skills-data.json
- * Run: node docs/build.js
+ * Run: node scripts/build-site.js
  */
 const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const MARKETPLACE = path.join(ROOT, ".claude-plugin", "marketplace.json");
-const OUTPUT = path.join(__dirname, "skills-data.json");
+const OUTPUT = path.join(ROOT, "docs", "skills-data.json");
 
 // Simple YAML frontmatter parser (no deps)
 function parseFrontmatter(content) {

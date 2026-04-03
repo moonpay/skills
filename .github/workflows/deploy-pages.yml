@@ -25,7 +25,7 @@ jobs:
           node-version: 20
 
       - name: Build skills data
-        run: node docs/build.js
+        run: node scripts/build-site.js
 
       - uses: actions/upload-pages-artifact@v3
         with:
