@@ -131,7 +131,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/metaplex"
+        "./skills/metaplex-development"
       ]
     }
   ]

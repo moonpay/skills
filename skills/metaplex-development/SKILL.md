@@ -1,6 +1,7 @@
 ---
 name: metaplex
 description: Metaplex development on Solana — NFTs, tokens, compressed NFTs, candy machines, token launches, autonomous agents. Use when working with Token Metadata, Core, Bubblegum, Candy Machine, Genesis, Agent Registry, or the mplx CLI.
+tags: [solana, nft, token-metadata, compressed-nfts, candy-machine, token-launch, agent-identity, bubblegum]
 license: Apache-2.0
 metadata:
   author: metaplex-foundation
@@ -19,6 +20,13 @@ Metaplex provides the standard infrastructure for NFTs and tokens on Solana:
 - **Token Metadata**: Fungible tokens + legacy NFTs/pNFTs
 - **Bubblegum**: Compressed NFTs (cNFTs) using Merkle trees — massive scale at minimal cost
 - **Candy Machine**: NFT drops with configurable minting rules
+
+## Prerequisites
+
+- Node.js installed
+- Metaplex CLI installed: `npm install -g @metaplex-foundation/cli`
+- CLI configured (RPC endpoint, keypair, funded wallet) — see `./references/cli-initial-setup.md`
+- For Bubblegum/compressed NFTs: a DAS-compatible RPC (Helius, Triton, or QuickNode)
 
 ## Tool Selection
 
