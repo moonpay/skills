@@ -122,7 +122,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/dawn",
+        "./skills/dawn-workflow",
         "./skills/dawn-auth",
         "./skills/dawn-strategy",
         "./skills/dawn-sdk-tools"

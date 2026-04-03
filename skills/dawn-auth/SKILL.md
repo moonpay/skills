@@ -172,8 +172,7 @@ If USDC.e or POL balance is $0 or missing, tell the user:
 > # Buy USDC.e directly with a card (easiest)
 > moonpay buy --token usdc_polygon --amount 100 --wallet <your-address>
 >
-> # Buy POL for gas
-> moonpay buy --token pol_polygon --amount 2 --wallet <your-address>
+> # Buy POL for gas — POL is not available via MoonPay; acquire via exchange withdrawal or bridge from another network
 > ```
 > Or send USDC.e + POL on the Polygon network to: `<your-address>`
 >
