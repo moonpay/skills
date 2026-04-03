@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoonPay Agent Skills</title>
+  <link rel="icon" href="https://www.moonpay.com/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- WebGL Canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <img src="https://www.moonpay.com/assets/logo-full-white.svg" alt="MoonPay" class="nav-logo-img">
+        <span class="nav-divider"></span>
+        <span class="nav-title">Skills</span>
+      </a>
+      <div class="nav-links">
+        <a href="https://www.moonpay.com/agents" target="_blank">Agents</a>
+        <a href="https://github.com/moon-labs-dev/skills" target="_blank">GitHub</a>
+        <a href="#skills" class="btn-primary">Explore Skills</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content reveal">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Open Source Skill Library
+      </div>
+      <h1>Don't build it.<br><span class="gradient-text">Install it.</span></h1>
+      <p class="hero-sub">Pre-built skills for AI agents. Wallet management, token trading, on-chain analytics, prediction markets — one line to install.</p>
+      <div class="hero-install">
+        <span class="prompt">$</span>
+        <code id="installCmd">npm install -g @moonpay/cli</code>
+        <button class="copy-btn" onclick="copyInstall()" aria-label="Copy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num" id="skillCount">0</span>
+          <span class="stat-label">Skills</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="pluginCount">0</span>
+          <span class="stat-label">Plugins</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="partnerCount">0</span>
+          <span class="stat-label">Partners</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Partners -->
+  <section class="partners reveal">
+    <p class="section-label">Integrated Partners</p>
+    <div class="partner-strip">
+      <img src="https://www.moonpay.com/assets/agents/messari.svg" alt="Messari">
+      <img src="https://www.moonpay.com/assets/agents/jupiter.svg" alt="Jupiter">
+      <img src="https://www.moonpay.com/assets/agents/dune.svg" alt="Dune">
+      <img src="https://www.moonpay.com/assets/agents/allium.svg" alt="Allium">
+      <img src="https://www.moonpay.com/assets/agents/kalshi.svg" alt="Kalshi">
+      <img src="https://www.moonpay.com/assets/agents/polymarket.svg" alt="Polymarket">
+      <img src="https://www.moonpay.com/assets/agents/corbits.svg" alt="Corbits">
+      <img src="https://www.moonpay.com/assets/agents/shipp.ai.svg" alt="Shipp">
+      <img src="https://www.moonpay.com/assets/agents/x402.svg" alt="x402">
+    </div>
+  </section>
+
+  <!-- Capabilities -->
+  <section class="capabilities reveal">
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cap-icon">💳</div>
+        <h3>Onramp</h3>
+        <p>Buy crypto with fiat. $0 fees for stablecoins.</p>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🏦</div>
+        <h3>Offramp</h3>
+        <p>Sell crypto back to fiat via virtual accounts.</p>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🔄</div>
+        <h3>Swap</h3>
+        <p>Trade tokens and bridge across chains.</p>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">📈</div>
+        <h3>Trade</h3>
+        <p>Prediction markets, DCA, limit orders.</p>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🔍</div>
+        <h3>Research</h3>
+        <p>On-chain analytics, token data, alpha signals.</p>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🛡️</div>
+        <h3>Verify</h3>
+        <p>Trust checks, token safety, reasoning gates.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platforms -->
+  <section class="platforms reveal">
+    <p class="section-label">Works with</p>
+    <div class="platform-row">
+      <div class="plat">Claude</div>
+      <div class="plat">ChatGPT</div>
+      <div class="plat">Gemini</div>
+      <div class="plat">Grok</div>
+    </div>
+  </section>
+
+  <!-- Skills Marketplace -->
+  <section class="marketplace" id="skills">
+    <div class="marketplace-header reveal">
+      <h2>Skill Marketplace</h2>
+      <p class="marketplace-sub">Browse <span id="totalSkills">0</span> skills across <span id="totalPlugins">0</span> plugins</p>
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search skills, tags, plugins..." class="search-input">
+        </div>
+        <div class="tags" id="tagFilters"></div>
+      </div>
+    </div>
+    <div id="pluginsGrid"></div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta reveal">
+    <div class="cta-glow"></div>
+    <div class="cta-content">
+      <h2>Build a skill</h2>
+      <p>Skills are Markdown files — no SDK, no code.<br>Write instructions, open a PR.</p>
+      <div class="cta-buttons">
+        <a href="https://github.com/moon-labs-dev/skills/blob/main/CONTRIBUTING.md" target="_blank" class="btn-primary btn-lg">Contributing Guide</a>
+        <a href="https://github.com/moon-labs-dev/skills" target="_blank" class="btn-ghost btn-lg">View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <img src="https://www.moonpay.com/assets/logo-full-white.svg" alt="MoonPay" class="footer-logo">
+        <span>&copy; 2026 MoonPay, Inc.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://www.moonpay.com/agents" target="_blank">Agents</a>
+        <a href="https://github.com/moon-labs-dev/skills" target="_blank">GitHub</a>
+        <a href="https://docs.moonpay.com/agents" target="_blank">Docs</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

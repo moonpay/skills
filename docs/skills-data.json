@@ -1,0 +1,461 @@
+{
+  "plugins": [
+    {
+      "name": "Moonpay",
+      "pluginName": "moonpay-skills",
+      "description": "Crypto infrastructure skills for AI agents — wallet management, token trading, cross-chain bridges, fiat on/off ramp, and more via the MoonPay CLI.",
+      "skills": [
+        {
+          "name": "moonpay-auth",
+          "description": "Set up the MoonPay CLI, authenticate, and manage local wallets. Use when commands fail, for login, or to create/import wallets.",
+          "tags": [
+            "setup"
+          ],
+          "icon": "🔑",
+          "path": "skills/moonpay-auth"
+        },
+        {
+          "name": "moonpay-block-explorer",
+          "description": "Open transactions, wallets, and tokens in the correct block explorer. Use after swaps, bridges, or transfers to view results in the browser.",
+          "tags": [
+            "explorer"
+          ],
+          "icon": "🔗",
+          "path": "skills/moonpay-block-explorer"
+        },
+        {
+          "name": "moonpay-buy-crypto",
+          "description": "Buy crypto with fiat via MoonPay. Returns a checkout URL to complete the purchase in a browser.",
+          "tags": [
+            "trading"
+          ],
+          "icon": "💳",
+          "path": "skills/moonpay-buy-crypto"
+        },
+        {
+          "name": "moonpay-check-wallet",
+          "description": "Check wallet balances and holdings. Use for \"what's in my wallet\", portfolio breakdown, token balances, allocation percentages, and USD values.",
+          "tags": [
+            "portfolio"
+          ],
+          "icon": "👛",
+          "path": "skills/moonpay-check-wallet"
+        },
+        {
+          "name": "moonpay-commerce",
+          "description": "Browse Shopify stores, search products, manage a cart, and checkout with crypto via Solana Pay. No login required.",
+          "tags": [
+            "commerce",
+            "shopping"
+          ],
+          "icon": "🛒",
+          "path": "skills/moonpay-commerce"
+        },
+        {
+          "name": "moonpay-deposit",
+          "description": "Create deposit links that accept crypto from any chain and auto-convert to stablecoins. No login required.",
+          "tags": [
+            "payments"
+          ],
+          "icon": "📥",
+          "path": "skills/moonpay-deposit"
+        },
+        {
+          "name": "moonpay-discover-tokens",
+          "description": "Search for tokens, check prices, get trading briefs, and evaluate risk. Use for token research, \"is this token safe?\", price checks, and market analysis.",
+          "tags": [
+            "research"
+          ],
+          "icon": "🔍",
+          "path": "skills/moonpay-discover-tokens"
+        },
+        {
+          "name": "moonpay-export-data",
+          "description": "Export portfolio balances and transaction history to CSV or JSON files. Use for spreadsheets, tax reporting, or record-keeping.",
+          "tags": [
+            "portfolio",
+            "export"
+          ],
+          "icon": "👛",
+          "path": "skills/moonpay-export-data"
+        },
+        {
+          "name": "moonpay-feedback",
+          "description": "Submit feedback, bug reports, or feature requests for the MoonPay CLI. Use when the user encounters issues, wants to suggest improvements, or has general feedback.",
+          "tags": [
+            "support"
+          ],
+          "icon": "💬",
+          "path": "skills/moonpay-feedback"
+        },
+        {
+          "name": "moonpay-fund-polymarket",
+          "description": "Install the Polymarket CLI and fund its wallet with USDC.e and POL on Polygon via MoonPay.",
+          "tags": [
+            "trading",
+            "setup",
+            "polymarket",
+            "polygon"
+          ],
+          "icon": "🔑",
+          "path": "skills/moonpay-fund-polymarket"
+        },
+        {
+          "name": "moonpay-hardware-wallet",
+          "description": "Connect a hardware wallet (Ledger) to the MoonPay CLI. Sign transactions on the physical device — no private keys stored locally.",
+          "tags": [
+            "wallet"
+          ],
+          "icon": "👛",
+          "path": "skills/moonpay-hardware-wallet"
+        },
+        {
+          "name": "moonpay-mcp",
+          "description": "Set up MoonPay as an MCP server for Claude Desktop or Claude Code. Provides all MoonPay CLI tools via the Model Context Protocol.",
+          "tags": [
+            "setup"
+          ],
+          "icon": "🔑",
+          "path": "skills/moonpay-mcp"
+        },
+        {
+          "name": "moonpay-missions",
+          "description": "A series of missions that walk through every MoonPay CLI capability. Use when the user is new or says \"get started\", \"show me what you can do\", or \"run the missions\".",
+          "tags": [
+            "setup"
+          ],
+          "icon": "🔑",
+          "path": "skills/moonpay-missions"
+        },
+        {
+          "name": "moonpay-prediction-market",
+          "description": "Trade on prediction markets (Polymarket, Kalshi). Search markets, buy/sell positions, track PnL, and view trade history.",
+          "tags": [
+            "trading",
+            "prediction-market",
+            "polymarket",
+            "kalshi"
+          ],
+          "icon": "📈",
+          "path": "skills/moonpay-prediction-market"
+        },
+        {
+          "name": "moonpay-price-alerts",
+          "description": "Set up desktop price alerts that notify you when tokens hit target prices. Observe-only — no trading, just notifications.",
+          "tags": [
+            "alerts",
+            "research"
+          ],
+          "icon": "🔍",
+          "path": "skills/moonpay-price-alerts"
+        },
+        {
+          "name": "moonpay-scout",
+          "description": ">",
+          "tags": [
+            "prediction-markets",
+            "polymarket",
+            "kalshi",
+            "arbitrage",
+            "trading"
+          ],
+          "icon": "📈",
+          "path": "skills/moonpay-scout"
+        },
+        {
+          "name": "moonpay-swap-tokens",
+          "description": "Swap tokens on the same chain or bridge tokens across chains. Use when the user wants to swap, bridge, or move tokens.",
+          "tags": [
+            "trading"
+          ],
+          "icon": "🔄",
+          "path": "skills/moonpay-swap-tokens"
+        },
+        {
+          "name": "moonpay-trading-automation",
+          "description": "Set up automated trading strategies — DCA, limit orders, and stop losses — by composing mp CLI commands with OS scheduling (cron/launchd).",
+          "tags": [
+            "trading",
+            "automation"
+          ],
+          "icon": "🤖",
+          "path": "skills/moonpay-trading-automation"
+        },
+        {
+          "name": "moonpay-upgrade",
+          "description": "\"Increase your MoonPay API rate limit by paying with crypto via x402.\"",
+          "tags": [
+            "payments"
+          ],
+          "icon": "⚡",
+          "path": "skills/moonpay-upgrade"
+        },
+        {
+          "name": "moonpay-virtual-account",
+          "description": "Set up a virtual account for fiat on-ramp and off-ramp. Covers KYC, wallet registration, bank accounts, onramp (fiat to stablecoin), and offramp (stablecoin to fiat).",
+          "tags": [
+            "fiat"
+          ],
+          "icon": "🏦",
+          "path": "skills/moonpay-virtual-account"
+        },
+        {
+          "name": "moonpay-x402",
+          "description": "Make paid API requests to x402-protected endpoints. Automatically handles payment with your local wallet.",
+          "tags": [
+            "payments",
+            "api"
+          ],
+          "icon": "💸",
+          "path": "skills/moonpay-x402"
+        }
+      ]
+    },
+    {
+      "name": "Shipp",
+      "pluginName": "shipp-skills",
+      "description": "Real-time sports data for prediction market agents via Shipp API",
+      "skills": [
+        {
+          "name": "shipp-sports-data",
+          "description": ">",
+          "tags": [
+            "sports",
+            "prediction-markets",
+            "polymarket",
+            "kalshi",
+            "real-time-data"
+          ],
+          "icon": "📈",
+          "path": "skills/shipp-sports-data"
+        }
+      ]
+    },
+    {
+      "name": "Myriad",
+      "pluginName": "myriad-skills",
+      "description": "BNB Chain prediction market trading via Myriad Markets CLI",
+      "skills": [
+        {
+          "name": "myriad-prediction-markets",
+          "description": ">",
+          "tags": [
+            "prediction-markets",
+            "trading",
+            "bnb-chain",
+            "mcp",
+            "defi"
+          ],
+          "icon": "🧩",
+          "path": "skills/myriad-prediction-markets"
+        }
+      ]
+    },
+    {
+      "name": "Messari",
+      "pluginName": "messari-skills",
+      "description": "Messari x402 research skills — pay-per-request access to Messari's full API via USDC on Base. Asset data, signals, funding intel, alpha scouting, and AI deep research. No API key required.",
+      "skills": [
+        {
+          "name": "messari-x402",
+          "description": "Access Messari's full API via x402 pay-per-request — no API key needed. Asset data, market metrics, signals, news, fundraising, token unlocks, on-chain networks, and AI chat, all paid with USDC on Base.",
+          "tags": [
+            "messari",
+            "x402",
+            "research",
+            "market-data",
+            "payments"
+          ],
+          "icon": "🔍",
+          "path": "skills/messari-x402"
+        },
+        {
+          "name": "messari-token-research",
+          "description": "Full token research workflow using Messari x402 API. Fetches asset fundamentals, price history, sentiment signals, and news, then synthesizes a research brief via Messari AI. Total cost ~$1.00–$1.50 USDC per run.",
+          "tags": [
+            "messari",
+            "research",
+            "tokens",
+            "signals",
+            "x402",
+            "workflow"
+          ],
+          "icon": "🔍",
+          "path": "skills/messari-token-research"
+        },
+        {
+          "name": "messari-alpha-scout",
+          "description": "Alpha scouting workflow using Messari x402. Scans mindshare gainers, trending topics, and news to surface emerging narratives and high-momentum assets. Total cost ~$1.25 USDC per run.",
+          "tags": [
+            "messari",
+            "alpha",
+            "signals",
+            "trending",
+            "x402",
+            "workflow"
+          ],
+          "icon": "💸",
+          "path": "skills/messari-alpha-scout"
+        },
+        {
+          "name": "messari-funding-intel",
+          "description": "Funding intelligence workflow using Messari x402. Scans recent rounds, M&A activity, venture funds, and organizations, then synthesizes a VC landscape brief via Messari AI. Total cost ~$0.75–$1.25 USDC per run.",
+          "tags": [
+            "messari",
+            "funding",
+            "vc",
+            "fundraising",
+            "x402",
+            "workflow"
+          ],
+          "icon": "💸",
+          "path": "skills/messari-funding-intel"
+        },
+        {
+          "name": "messari-deep-research",
+          "description": "Async deep-research report workflow using Messari AI. Starts a long-form research job, polls until complete, and returns a comprehensive report on any crypto topic, asset, or protocol. Cost varies; typically $0.50–$2.00 USDC.",
+          "tags": [
+            "messari",
+            "research",
+            "ai",
+            "deep-research",
+            "x402",
+            "workflow"
+          ],
+          "icon": "🔍",
+          "path": "skills/messari-deep-research"
+        }
+      ]
+    },
+    {
+      "name": "Corbits",
+      "pluginName": "corbits-skills",
+      "description": "Paid API marketplace with x402 USDC micropayments via Corbits",
+      "skills": [
+        {
+          "name": "corbits-marketplace",
+          "description": ">",
+          "tags": [
+            "api-marketplace",
+            "x402",
+            "micropayments",
+            "usdc",
+            "defi"
+          ],
+          "icon": "💸",
+          "path": "skills/corbits-marketplace"
+        }
+      ]
+    },
+    {
+      "name": "Dune",
+      "pluginName": "dune-skills",
+      "description": "Blockchain analytics via Dune REST API — DuneSQL queries against live on-chain data",
+      "skills": [
+        {
+          "name": "dune-analytics",
+          "description": ">",
+          "tags": [
+            "blockchain",
+            "analytics",
+            "dune",
+            "on-chain",
+            "data",
+            "defi",
+            "sql"
+          ],
+          "icon": "🔗",
+          "path": "skills/dune-analytics"
+        }
+      ]
+    },
+    {
+      "name": "Allium",
+      "pluginName": "allium-skills",
+      "description": "On-chain blockchain data via Allium — prices, wallet balances, transactions, token info, and custom SQL analytics across 40+ chains.",
+      "skills": [
+        {
+          "name": "allium-onchain-data",
+          "description": ">-",
+          "tags": [
+            "blockchain-data",
+            "prices",
+            "wallets",
+            "analytics",
+            "multi-chain",
+            "on-chain",
+            "sql"
+          ],
+          "icon": "👛",
+          "path": "skills/allium-onchain-data"
+        },
+        {
+          "name": "allium-x402",
+          "description": ">-",
+          "tags": [
+            "blockchain-data",
+            "prices",
+            "wallets",
+            "analytics",
+            "x402",
+            "micropayments",
+            "multi-chain"
+          ],
+          "icon": "👛",
+          "path": "skills/allium-x402"
+        }
+      ]
+    },
+    {
+      "name": "Maiat",
+      "pluginName": "maiat-skills",
+      "description": "Trust verification and token safety checks for AI agents via Maiat Protocol",
+      "skills": [
+        {
+          "name": "maiat-trust-check",
+          "description": "Check if an agent or token is trustworthy before transacting. Returns trust score and verdict from 29,000+ indexed agents on Base. Use before any swap, transfer, or agent interaction.",
+          "tags": [
+            "security",
+            "trust",
+            "agents",
+            "defi"
+          ],
+          "icon": "🛡️",
+          "path": "skills/maiat-trust-check"
+        },
+        {
+          "name": "maiat-token-safety",
+          "description": "Check if an ERC-20 token is safe before swapping. Detects honeypots, high-tax tokens, and rug pulls. Use before any token swap.",
+          "tags": [
+            "security",
+            "defi",
+            "tokens"
+          ],
+          "icon": "🛡️",
+          "path": "skills/maiat-token-safety"
+        }
+      ]
+    },
+    {
+      "name": "Thoughtproof",
+      "pluginName": "thoughtproof-skills",
+      "description": "Adversarial multi-model reasoning verification for AI agents before trades execute, via x402 micropayments on Base.",
+      "skills": [
+        {
+          "name": "thoughtproof-reasoning-check",
+          "description": "Verify whether an AI agent's decision is well-reasoned before executing. Adversarial multi-model critique (Claude, Grok, DeepSeek) returns ALLOW, BLOCK, or UNCERTAIN with confidence score. Use before any high-value swap, trade, or autonomous action.",
+          "tags": [
+            "verification",
+            "reasoning",
+            "agents",
+            "defi",
+            "security"
+          ],
+          "icon": "🧪",
+          "path": "skills/thoughtproof-reasoning-check"
+        }
+      ]
+    }
+  ],
+  "generatedAt": "2026-04-02T20:31:46.201Z"
+}
