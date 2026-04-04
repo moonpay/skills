@@ -5,107 +5,88 @@ description: >
 tags: [perp, arbitrage, funding-rate, hyperliquid, pacifica, lighter, aster, trading]
 ---
 
-# Perpetual Futures Funding Rate Arbitrage Scout
+# Perpetual Futures Funding Rate Arbitrage
 
-You are a multi-exchange perpetual futures arbitrage agent. Your job is to find **funding rate edge** — either perp-perp arbitrage (long one exchange, short another) or spot-perp arbitrage — across Hyperliquid, Pacifica, Lighter, and Aster.
+Scan for funding rate edge across Hyperliquid, Pacifica, Lighter, and Aster, and execute delta-neutral arbitrage positions via the `perp` CLI.
 
-**Asset to scan:** {{args}} (if empty, scan top coins by open interest on all exchanges)
+## Prerequisites
 
----
+- Install perp-cli: `npm install -g perp-cli`
+- Run setup wizard: `perp setup` (configures private key + default exchange)
+- Funded margin accounts on at least two exchanges (for delta-neutral arb)
+- Verify: `perp account balance -e hyperliquid && perp account balance -e pacifica`
 
-## Step 1 — SCAN funding rates in parallel
+## Commands
 
-Pull current funding rates across all exchanges simultaneously using `arb scan` or equivalent perp-cli MCP tool.
+```bash
+# Scan funding rates across all exchanges
+perp arb scan
 
-Print:
-```
-🔍 SCANNING funding rates for "{{args}}" across Hyperliquid, Pacifica, Lighter, Aster...
-```
+# Scan with live continuous monitoring
+perp arb scan --live
 
-## Step 2 — IDENTIFY OPPORTUNITIES
+# Execute arb: long on exchange A, short on exchange B
+perp arb exec <symbol> <longExch> <shortExch> <sizeUsd>
 
-For each asset, extract:
-- Funding rate on each exchange (annualized %)
-- Open interest and liquidity depth
-- Position limits and margin requirements
+# Auto-run arb daemon (finds and enters opportunities automatically)
+perp arb auto
 
-Print each meaningful spread:
-```
-📊 [ASSET]
-   Hyperliquid:  [rate]%  liq: $[X]
-   Pacifica:     [rate]%  liq: $[X]
-   Lighter:      [rate]%  liq: $[X]
-   Aster:        [rate]%  liq: $[X]
-   Best spread: [high exchange] → [low exchange] = [diff]% annualized
-```
+# Check open arb positions and PnL
+perp arb status
 
-## Step 3 — RUN THE ARB MATH
+# Close an arb position on both legs
+perp arb close <symbol>
 
-For the top candidates, calculate net P&L including:
-- Funding payment differential
-- Entry/exit slippage (use bid/ask, not mid)
-- Trading fees on both legs
-- Margin cost (capital efficiency)
+# View arb history and performance
+perp arb history
 
-```
-Direction: Long [asset] on [low-rate exchange] + Short [asset] on [high-rate exchange]
-  Funding earned:  +[X]% annualized on short leg
-  Funding paid:    -[Y]% annualized on long leg
-  Net funding:     +[Z]% annualized
-  Round-trip fees: -[F]% (entry + exit both legs)
-  Slippage est:    -[S]% (based on order book depth)
-  NET EDGE:        [Z - F - S]% annualized
+# Rebalance capital across exchanges for arb
+perp arb rebalance
+
+# Delta-neutral funding rate farming (spot long + perp short)
+perp bot delta-neutral
+
+# Quick-start arb bot
+perp bot quick-arb
 ```
 
-If net edge > 5% annualized, flag it:
-```
-🚨 ARB FOUND: [asset]
-   Long [exchange A] @ [rate]% | Short [exchange B] @ [rate]%
-   Net edge: [X]% annualized | Break-even: [N] hours
-   ⚠️  Check: same contract size? margin currency? liquidation risk?
-```
+## Workflow
 
-## Step 4 — RISK CHECKS
+1. **Scan rates** — `perp arb scan` to see current funding spreads across all exchanges
+2. **Identify edge** — look for annualized spread > 5% after fees (shown in scan output)
+3. **Verify liquidity** — confirm both legs have sufficient depth for your size
+4. **Execute** — `perp arb exec <symbol> <longExch> <shortExch> <sizeUsd>` enters both legs simultaneously
+5. **Monitor** — `perp arb status` shows open positions with real PnL and funding earned
+6. **Close** — `perp arb close <symbol>` exits both legs when spread narrows
 
-Before recommending execution, verify:
-- **Liquidation asymmetry** — do both legs use the same margin currency? Cross-margin vs isolated?
-- **Funding payment timing** — are payments hourly, 8h, or continuous? Mismatched timing = cash flow gap risk
-- **Contract specs** — same underlying index? price feed source?
-- **Exchange risk** — counterparty/smart contract risk on each venue
+## Examples
 
-Flag any issues:
-```
-⚠️  RISK: [issue description]
-   Impact: [how it affects the trade]
-   Mitigation: [what to do]
-```
+```bash
+# Scan all funding rates live
+perp arb scan --live
 
-## Step 5 — RANK AND RECOMMEND
+# Execute BTC arb: long on Lighter, short on Hyperliquid, $5000 size
+perp arb exec BTC lighter hyperliquid 5000
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RANK  ASSET   LONG         SHORT        NET EDGE  RISK
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- 1    [asset] [exchange]   [exchange]    +[X]%    LOW
- 2    [asset] [exchange]   [exchange]    +[Y]%    MEDIUM
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Check open arb positions
+perp arb status
+
+# Auto arb daemon
+perp arb auto
+
+# Delta-neutral bot (spot long + perp short for funding yield)
+perp bot delta-neutral
 ```
 
-## Step 6 — EXECUTE (if instructed)
+## Error Handling
 
-Use perp-cli's `trade` MCP tools to place both legs. Always:
-1. Place the short leg first (captures funding immediately)
-2. Confirm fill before placing the long leg
-3. Verify net position is delta-neutral after both fills
-4. Set alerts for funding rate changes that would close the edge
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `Insufficient margin on <exchange>` | Not enough collateral | `perp funds deposit -e <exchange>` |
+| `Liquidity too thin` | Order book too shallow for size | Reduce size or use `perp arb exec` with smaller `sizeUsd` |
+| `Rate flipped negative` | Funding rate changed direction | Close with `perp arb close <symbol>` |
 
----
+## Related Skills
 
-## Agent rules
-
-- Always show full math — no black-box recommendations
-- Use bid/ask prices for fee/slippage calc, never mid
-- Minimum viable edge: 5% annualized after all costs
-- Always check both legs can be sized equally given liquidity
-- Delta-neutrality is non-negotiable — confirm both legs filled
-- If funding rates flip negative on your short leg, the arb collapses — monitor continuously
+- [perp-trade](../perp-trade/) — execute individual trades for each arb leg
+- [perp-portfolio](../perp-portfolio/) — monitor all open positions and net exposure

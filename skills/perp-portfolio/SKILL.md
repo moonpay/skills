@@ -5,70 +5,86 @@ description: >
 tags: [perp, portfolio, positions, pnl, hyperliquid, pacifica, lighter, aster]
 ---
 
-# Multi-Exchange Perpetual Futures Portfolio View
+# Multi-Exchange Perpetual Futures Portfolio
 
-You are a portfolio aggregation agent for perpetual futures positions. Fetch and consolidate all open positions, balances, and risk metrics across every connected exchange.
+View balances, open positions, PnL, and risk metrics across all configured perp exchanges via the `perp` CLI.
 
----
+## Prerequisites
 
-## Step 1 — FETCH all account data in parallel
+- Install perp-cli: `npm install -g perp-cli`
+- Run setup wizard: `perp setup` (configures private key + default exchange)
+- Verify: `perp account balance`
 
-Use perp-cli `account` and `portfolio` MCP tools to pull from all configured exchanges simultaneously.
+## Commands
 
-Print:
-```
-📡 Fetching positions across all exchanges...
-```
+```bash
+# Cross-exchange portfolio overview (all exchanges)
+perp portfolio
 
-## Step 2 — DISPLAY consolidated portfolio
+# Portfolio for specific exchanges only
+perp portfolio --exchange hyperliquid,pacifica
 
-For each exchange with active positions or balance:
+# Account balance on one exchange
+perp account balance [-e <exchange>]
 
-```
-┌─────────────────────────────────────────────────────┐
-│  [EXCHANGE NAME]                                    │
-├─────────────────────────────────────────────────────┤
-│  Margin balance:  $[X]                              │
-│  Available:       $[X]                              │
-│  Margin ratio:    [X]%  ([safe/warning/danger])     │
-├──────────┬──────┬──────┬────────┬────────┬──────────┤
-│  Asset   │ Side │ Size │ Entry  │ Mark   │  uPnL   │
-├──────────┼──────┼──────┼────────┼────────┼──────────┤
-│  [asset] │ LONG │ [X]  │ [price]│ [price]│  [+/-$] │
-└──────────┴──────┴──────┴────────┴────────┴──────────┘
-```
+# Open positions
+perp account positions [-e <exchange>]
 
-## Step 3 — AGGREGATE totals
+# PnL summary (realized + unrealized + funding)
+perp account pnl [-e <exchange>]
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PORTFOLIO SUMMARY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total margin (all exchanges):    $[X]
-Total unrealized PnL:           [+/-$X]
-Net delta exposure:              [+/-$X]  ([long/short/neutral])
-Largest single position:         [asset] on [exchange] — [size]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Open orders
+perp account orders [-e <exchange>]
+
+# Funding payment history
+perp account funding-history [-e <exchange>]
+
+# Live status dashboard: balances, positions, top arb opportunities
+perp status
+
+# Live PnL monitoring (real-time updates)
+perp trade pnl-track
 ```
 
-## Step 4 — FLAG risks
+## Workflow
 
-Check for:
-- **High margin utilization** (>70%) — flag with warning
-- **Positions near liquidation** — calculate distance to liq price
-- **Concentrated exposure** — single asset >50% of total notional
-- **Funding costs accruing** — show daily funding burn for each position
+1. **Overview** — run `perp portfolio` for a full cross-exchange summary
+2. **Drill into an exchange** — `perp account positions -e hyperliquid` for detailed positions
+3. **Check PnL** — `perp account pnl` for realized + unrealized breakdown
+4. **Monitor risk** — look for high margin utilization (>70%) and positions near liquidation in the output
+5. **Live view** — `perp status` for a unified real-time dashboard
 
+## Examples
+
+```bash
+# Full portfolio view across all exchanges
+perp portfolio
+
+# Hyperliquid positions only
+perp account positions -e hyperliquid
+
+# PnL breakdown
+perp account pnl
+
+# Funding payment history
+perp account funding-history
+
+# Live unified dashboard
+perp status
+
+# Real-time PnL tracking
+perp trade pnl-track
 ```
-⚠️  RISK FLAGS:
-  [exchange]: margin at [X]% — [N] positions
-  [asset]: [X]% from liquidation @ $[price]
-  Daily funding cost: -$[X]/day (annualized: -[X]%)
-```
 
-## Agent rules
+## Error Handling
 
-- Always show uPnL in dollar terms, not just %
-- Flag any exchange that fails to connect or returns stale data
-- If margin ratio > 80% on any exchange, lead with that warning
-- Show liquidation prices for all leveraged positions
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `No accounts configured` | Setup not run | Run `perp setup` |
+| `Connection failed for <exchange>` | RPC/API issue | Check internet and retry; exchange may be down |
+| `No positions found` | No open trades | Expected — account is flat |
+
+## Related Skills
+
+- [perp-trade](../perp-trade/) — open, close, and manage positions
+- [perp-arb](../perp-arb/) — scan and execute funding rate arbitrage
