@@ -4,7 +4,7 @@ description: >
   Describe what this skill does and when an AI agent should use it.
   Be specific — this field determines whether Claude loads this skill.
   Bad: "Analytics tool for blockchain data"
-  Good: "Use when the user asks to analyze on-chain token metrics, wallet PnL, or DEX volume using Dune Analytics queries"
+  Good: "Use when the user asks to analyze on-chain token metrics, wallet PnL, or DEX volume using Dune queries"
 tags: [tag1, tag2]
 ---
 

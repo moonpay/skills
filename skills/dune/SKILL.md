@@ -1,11 +1,11 @@
 ---
-name: dune-analytics
+name: dune
 description: >
   Blockchain analytics via the Dune CLI — execute DuneSQL queries against live on-chain data, discover decoded contract tables, and monitor credit usage. Use when the user asks about on-chain data, wallet activity, DEX trades, token transfers, smart contract events, or says "query Dune", "run a Dune query", or "search Dune datasets". Pairs with MoonPay to analyze wallets you create and fund.
 tags: [blockchain, analytics, dune, on-chain, data, defi, sql]
 ---
 
-# Dune Analytics
+# Dune
 
 Query live on-chain data with the [Dune CLI](https://github.com/duneanalytics/cli) ([overview](https://docs.dune.com/api-reference/agents/cli-and-skills)). Pair with MoonPay to create and fund the wallets you analyze.
 
@@ -108,15 +108,15 @@ Use the [MoonPay CLI](https://www.npmjs.com/package/@moonpay/cli) (`mp`) to crea
 ### Create a Wallet to Monitor
 
 ```bash
-mp wallet create --name "dune-agent-wallet"
-mp wallet retrieve --wallet "dune-agent-wallet"
+mp wallet create --name "dune-wallet"
+mp wallet retrieve --wallet "dune-wallet"
 # Note your Ethereum address for Dune queries
 ```
 
 ### Query Your MoonPay Wallet On-Chain
 
 ```bash
-WALLET=$(mp wallet retrieve --wallet "dune-agent-wallet" --json | jq -r '.addresses.ethereum')
+WALLET=$(mp wallet retrieve --wallet "dune-wallet" --json | jq -r '.addresses.ethereum')
 
 dune query run-sql \
   --sql "SELECT block_time, hash, value/1e18 AS eth, \"to\" FROM ethereum.transactions WHERE lower(\"from\") = lower('${WALLET}') ORDER BY block_time DESC LIMIT 20" \
@@ -135,7 +135,7 @@ mp token balance list --wallet <your-eth-address> --chain ethereum
 
 # Bridge to follow yields
 mp token bridge \
-  --from-wallet dune-agent-wallet --from-chain ethereum \
+  --from-wallet dune-wallet --from-chain ethereum \
   --from-token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
   --from-amount 500 \
   --to-chain polygon \
@@ -172,7 +172,7 @@ When you use `-o json` or inspect async executions, states match the Dune API:
 - **Dune CLI & Skills:** https://docs.dune.com/api-reference/agents/cli-and-skills
 - **REST API reference (underlying service):** https://docs.dune.com/api-reference/overview/introduction
 - **DuneSQL reference:** https://docs.dune.com/query-engine/Functions-and-operators
-- **Dune Analytics:** https://dune.com
+- **Dune:** https://dune.com
 - **MoonPay CLI:** https://www.npmjs.com/package/@moonpay/cli
 
 ## Related Skills
