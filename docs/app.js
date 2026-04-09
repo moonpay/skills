@@ -1,7 +1,12 @@
+const SKILLS_DATA_JSON_URL = document.currentScript
+  ? new URL("./skills-data.json", document.currentScript.src).href
+  : new URL("./skills-data.json", window.location.href).href;
+
 // ——— WebGL Particle Background ———
 (function initWebGL() {
   const canvas = document.getElementById("bgCanvas");
-  const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  const gl =
+    canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
   if (!gl) return;
 
   function resize() {
@@ -106,62 +111,89 @@
 })();
 
 // ——— Scroll Reveal ———
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add("visible");
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1 });
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add("visible");
+        observer.unobserve(e.target);
+      }
+    });
+  },
+  { threshold: 0.1 },
+);
 
-document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
 // ——— Skills Data ———
+const GITHUB_TREE_BASE = "https://github.com/moon-labs-dev/skills/tree/main/";
+
+/** Safe GitHub tree URL for a repo-relative skill path (blocks schemes, traversal, absolute paths). */
+function githubSkillTreeUrl(skillPath) {
+  if (typeof skillPath !== "string" || skillPath.length === 0)
+    return GITHUB_TREE_BASE;
+  const normalized = skillPath.replace(/\\/g, "/");
+  if (normalized.startsWith("/") || normalized.includes(".."))
+    return GITHUB_TREE_BASE;
+  if (/^[a-zA-Z][a-zA-Z+.-]*:/.test(normalized)) return GITHUB_TREE_BASE;
+  return (
+    GITHUB_TREE_BASE + normalized.split("/").map(encodeURIComponent).join("/")
+  );
+}
+
 let SKILLS_DATA = null;
 let activeTag = null;
 let searchQuery = "";
 
 async function loadSkills() {
   try {
-    const res = await fetch("skills-data.json");
+    const res = await fetch(SKILLS_DATA_JSON_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     SKILLS_DATA = await res.json();
-  } catch {
-    console.warn("skills-data.json not found, using empty data");
+    if (!SKILLS_DATA || !Array.isArray(SKILLS_DATA.plugins)) {
+      throw new Error("invalid skills-data.json shape");
+    }
+  } catch (e) {
+    console.warn("Could not load skills-data.json, using empty data:", e);
     SKILLS_DATA = { plugins: [] };
   }
   initStats();
   renderTags();
   render();
   // Re-observe plugin groups for scroll reveal
-  document.querySelectorAll(".plugin-group").forEach(el => observer.observe(el));
+  document
+    .querySelectorAll(".plugin-group")
+    .forEach((el) => observer.observe(el));
 }
 
 function getAllTags() {
   const tags = new Map();
-  SKILLS_DATA.plugins.forEach(p => p.skills.forEach(s =>
-    (s.tags || []).forEach(t => tags.set(t, (tags.get(t) || 0) + 1))
-  ));
+  SKILLS_DATA.plugins.forEach((p) =>
+    p.skills.forEach((s) =>
+      (s.tags || []).forEach((t) => tags.set(t, (tags.get(t) || 0) + 1)),
+    ),
+  );
   // Sort by frequency desc, then alpha
   return [...tags.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(e => e[0])
+    .map((e) => e[0])
     .slice(0, 20); // Top 20 tags
 }
 
 function render() {
   const grid = document.getElementById("pluginsGrid");
-  grid.innerHTML = "";
+  grid.replaceChildren();
 
   let totalVisible = 0;
 
   SKILLS_DATA.plugins.forEach((plugin, i) => {
-    const filtered = plugin.skills.filter(s => {
+    const filtered = plugin.skills.filter((s) => {
       const matchTag = !activeTag || (s.tags || []).includes(activeTag);
-      const matchSearch = !searchQuery ||
+      const matchSearch =
+        !searchQuery ||
         s.name.toLowerCase().includes(searchQuery) ||
         s.description.toLowerCase().includes(searchQuery) ||
-        (s.tags || []).some(t => t.includes(searchQuery)) ||
+        (s.tags || []).some((t) => t.includes(searchQuery)) ||
         plugin.name.toLowerCase().includes(searchQuery);
       return matchTag && matchSearch;
     });
@@ -172,27 +204,61 @@ function render() {
     const group = document.createElement("div");
     group.className = "plugin-group reveal";
     group.style.animationDelay = `${i * 0.05}s`;
-    group.innerHTML = `
-      <div class="plugin-header">
-        <span class="plugin-name">${plugin.name}</span>
-        <span class="plugin-count">${filtered.length}</span>
-      </div>
-      <div class="plugin-desc">${plugin.description}</div>
-      <div class="skills-grid">
-        ${filtered.map(s => `
-          <a class="skill-card" href="https://github.com/moon-labs-dev/skills/tree/main/${s.path}" target="_blank" style="text-decoration:none;color:inherit;">
-            <div class="skill-card-top">
-              <div class="skill-name">${s.name}</div>
-              <div class="skill-icon">${s.icon}</div>
-            </div>
-            <div class="skill-desc">${s.description}</div>
-            <div class="skill-tags">
-              ${(s.tags || []).map(t => `<span class="skill-tag">${t}</span>`).join("")}
-            </div>
-          </a>
-        `).join("")}
-      </div>
-    `;
+
+    const header = document.createElement("div");
+    header.className = "plugin-header";
+    const pluginName = document.createElement("span");
+    pluginName.className = "plugin-name";
+    pluginName.textContent = plugin.name ?? "";
+    const pluginCount = document.createElement("span");
+    pluginCount.className = "plugin-count";
+    pluginCount.textContent = String(filtered.length);
+    header.append(pluginName, pluginCount);
+
+    const pluginDesc = document.createElement("div");
+    pluginDesc.className = "plugin-desc";
+    pluginDesc.textContent = plugin.description ?? "";
+
+    const skillsGrid = document.createElement("div");
+    skillsGrid.className = "skills-grid";
+
+    filtered.forEach((s) => {
+      const card = document.createElement("a");
+      card.className = "skill-card";
+      card.href = githubSkillTreeUrl(s.path);
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+      card.style.textDecoration = "none";
+      card.style.color = "inherit";
+
+      const top = document.createElement("div");
+      top.className = "skill-card-top";
+      const skillName = document.createElement("div");
+      skillName.className = "skill-name";
+      skillName.textContent = s.name ?? "";
+      const skillIcon = document.createElement("div");
+      skillIcon.className = "skill-icon";
+      skillIcon.textContent = s.icon ?? "";
+      top.append(skillName, skillIcon);
+
+      const skillDesc = document.createElement("div");
+      skillDesc.className = "skill-desc";
+      skillDesc.textContent = s.description ?? "";
+
+      const tagsWrap = document.createElement("div");
+      tagsWrap.className = "skill-tags";
+      (s.tags || []).forEach((t) => {
+        const tagEl = document.createElement("span");
+        tagEl.className = "skill-tag";
+        tagEl.textContent = t;
+        tagsWrap.appendChild(tagEl);
+      });
+
+      card.append(top, skillDesc, tagsWrap);
+      skillsGrid.appendChild(card);
+    });
+
+    group.append(header, pluginDesc, skillsGrid);
     grid.appendChild(group);
     observer.observe(group);
   });
@@ -203,11 +269,25 @@ function render() {
 function renderTags() {
   const container = document.getElementById("tagFilters");
   const tags = getAllTags();
-  container.innerHTML =
-    `<button class="tag-btn ${!activeTag ? "active" : ""}" data-tag="">all</button>` +
-    tags.map(t => `<button class="tag-btn ${activeTag === t ? "active" : ""}" data-tag="${t}">${t}</button>`).join("");
+  container.replaceChildren();
 
-  container.querySelectorAll(".tag-btn").forEach(btn => {
+  const allBtn = document.createElement("button");
+  allBtn.type = "button";
+  allBtn.className = `tag-btn${!activeTag ? " active" : ""}`;
+  allBtn.dataset.tag = "";
+  allBtn.textContent = "all";
+  container.appendChild(allBtn);
+
+  tags.forEach((t) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `tag-btn${activeTag === t ? " active" : ""}`;
+    btn.dataset.tag = t;
+    btn.textContent = t;
+    container.appendChild(btn);
+  });
+
+  container.querySelectorAll(".tag-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       activeTag = btn.dataset.tag || null;
       renderTags();
@@ -219,7 +299,9 @@ function renderTags() {
 function initStats() {
   const total = SKILLS_DATA.plugins.reduce((a, p) => a + p.skills.length, 0);
   const plugins = SKILLS_DATA.plugins.length;
-  const partners = SKILLS_DATA.plugins.filter(p => p.name.toLowerCase() !== "moonpay").length;
+  const partners = SKILLS_DATA.plugins.filter(
+    (p) => p.name.toLowerCase() !== "moonpay",
+  ).length;
 
   animateNum("skillCount", total);
   animateNum("pluginCount", plugins);
@@ -247,9 +329,11 @@ function copyInstall() {
   const text = document.getElementById("installCmd").textContent;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.querySelector(".copy-btn");
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+    btn.innerHTML =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
     setTimeout(() => {
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+      btn.innerHTML =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
     }, 1500);
   });
 }
