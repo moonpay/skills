@@ -1,9 +1,9 @@
 ---
 name: moonpay-wallet-statusline
 description: >
-  Show MoonPay wallet balances in the Claude Code status line using a local
+  Show MoonPay wallet balances in a compatible CLI status line using a local
   cache and refresh script. Use when the user asks to "show balances in the
-  status bar", "add wallet to Claude status line", or wants a persistent
+  status bar", "add wallet to the CLI status line", or wants a persistent
   balance display while working.
 tags: [wallet, statusline]
 ---
@@ -12,13 +12,13 @@ tags: [wallet, statusline]
 
 ## Goal
 
-Display cached MoonPay wallet balances in the Claude Code status line. This skill creates:
+Display cached MoonPay wallet balances in a compatible CLI status line. This skill creates:
 
 - `~/.config/moonpay/statusline.json` — tracked wallets, chains, and format
 - `~/.config/moonpay/refresh-statusline.sh` — refreshes balances from the MoonPay CLI
 - `~/.config/moonpay/statusline-cache.txt` — pre-rendered ANSI output for the status line
 
-Any other status display can also read the cache file directly.
+Any compatible status display can read the cache file directly.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Any other status display can also read the cache file directly.
 - At least one wallet: `mp wallet list`
 - `jq` installed: `which jq`
 - `bc` installed: `which bc`
-- For Claude Code: the built-in status line setup has already been run, so `~/.claude/settings.json` has a `statusLine` config and `~/.claude/statusline.sh` exists
+- For status line integration: the target CLI supports a command-based status line or any equivalent scriptable status bar
 
 ## Commands
 
@@ -63,13 +63,19 @@ which jq
 which bc
 ```
 
-If the user wants Claude Code integration, also verify:
+If the user wants integration with a specific CLI, verify that CLI's status line entry point too.
+
+Examples:
 
 ```bash
+# Claude Code
 test -f ~/.claude/statusline.sh && echo "statusline script present"
+
+# Cursor CLI
+test -f ~/.cursor/statusline.sh && echo "cursor statusline script present"
 ```
 
-If `~/.claude/statusline.sh` is missing or Claude Code is not configured with a `statusLine`, tell the user to run the built-in `/statusline` command first, or configure `statusLine` manually in `~/.claude/settings.json`, then come back to this skill.
+If the target CLI does not yet have a status line configured, help the user set that up first, then come back to this skill.
 
 ### 2. Select wallet addresses and chains
 
@@ -311,7 +317,28 @@ For plain text:
 sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
 ```
 
-### 7. Wire into Claude Code
+### 7. Wire into a compatible CLI
+
+The generic pattern is:
+
+1. Find the status line script or inline command used by the target CLI
+2. Read `~/.config/moonpay/statusline-cache.txt`
+3. Append that cached output to the existing status line
+4. Preserve ANSI colors if the CLI supports them
+
+Any CLI that can run a script on status line render can use the cached output directly:
+
+```bash
+cat ~/.config/moonpay/statusline-cache.txt
+```
+
+If the target CLI does not support ANSI colors, strip them first:
+
+```bash
+sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
+```
+
+#### Claude Code example
 
 Add this block to `~/.claude/statusline.sh` before the final render/output section. Match the surrounding script style if variable names differ.
 
@@ -375,13 +402,40 @@ Optional on Claude Code v2.1.85+: add a `PostToolUse` hook to `~/.claude/setting
 }
 ```
 
+#### Cursor CLI example
+
+Cursor CLI uses `~/.cursor/cli-config.json` with a `statusLine.command` entry that typically points at `~/.cursor/statusline.sh`. Add the same cache-read pattern to that script, for example:
+
+```bash
+WALLET_CACHE="$HOME/.config/moonpay/statusline-cache.txt"
+WALLET_STR=""
+if [ -f "$WALLET_CACHE" ]; then
+  WALLET_STR="$(cat "$WALLET_CACHE")"
+fi
+
+if [ -n "$WALLET_STR" ]; then
+  [ -n "$LINE3" ] && LINE3="${LINE3}${SEP}"
+  LINE3="${LINE3}${WALLET_STR}"
+fi
+```
+
+If the user's script uses different variable names or a single-line layout, adapt the snippet to match the existing format.
+
+#### Other CLIs
+
+For any other CLI tool with a scriptable status line:
+
+- locate the script or command used for the status line
+- append `cat ~/.config/moonpay/statusline-cache.txt` or the ANSI-stripped variant
+- if the tool supports command hooks or post-command automation, wire `bash ~/.config/moonpay/refresh-statusline.sh` into that mechanism
+
 ### 8. Confirm
 
 Tell the user:
 
 - The cache file is `~/.config/moonpay/statusline-cache.txt`
 - Run `moonpay-wallet-statusline-refresh` to refresh manually
-- Changes appear in Claude Code on the next status line render or next session, depending on local setup
+- Changes appear in the target CLI on the next status line render or next session, depending on local setup
 
 ## Other agents
 
@@ -406,7 +460,7 @@ sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
 | `bc: command not found` | bc not installed | Install via package manager |
 | `mp verify` failed | Not authenticated or expired auth | Run `mp login` then `mp verify` |
 | Empty cache after refresh | No balances found on configured entries | Check configured addresses/chains and verify the wallet has funds |
-| Claude status line does not update | Claude status line not set up yet | Run built-in `/statusline`, then add the wallet cache block |
+| Status line does not update in the target CLI | CLI status line not set up yet or cache not wired in | Configure that CLI's status line first, then add the wallet cache block |
 
 ## Related skills
 

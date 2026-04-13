@@ -1,7 +1,7 @@
 ---
 name: moonpay-wallet-statusline-refresh
 description: >
-  Manually refresh wallet balances shown in the Claude Code status line. Use
+  Manually refresh wallet balances shown in a compatible CLI status line. Use
   when the user says "refresh balances", "update status bar", or after
   receiving funds from outside the CLI.
 tags: [wallet, statusline]
@@ -11,7 +11,7 @@ tags: [wallet, statusline]
 
 ## Goal
 
-Refresh the cached MoonPay wallet balances shown in the Claude Code status line.
+Refresh the cached MoonPay wallet balances shown in a compatible CLI status line.
 
 ## Prerequisites
 
@@ -60,7 +60,7 @@ mp verify
 
 5. Only query the underlying `mp` balance commands directly if the user explicitly asks for a detailed balance breakdown. Otherwise, trust the configured refresh script as the source of truth for the status line.
 
-6. Confirm that the cache was refreshed and remind the user that Claude Code may show the change on the next status line render or next session, depending on local setup.
+6. Confirm that the cache was refreshed and remind the user that the target CLI may show the change on the next status line render or next session, depending on local setup.
 
 ## Error handling
 
