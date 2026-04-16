@@ -136,6 +136,16 @@
         "./skills/alchemy-agentic-gateway",
         "./skills/alchemy-api"
       ]
+    },
+    {
+      "name": "jupiter-skills",
+      "description": "Jupiter DEX aggregator on Solana — swap, lend, perps, limit orders, DCA, token data, and portfolio tracking via Jupiter APIs.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/jupiter-api",
+        "./skills/jupiter-lend"
+      ]
     }
   ]
 }
