@@ -33,8 +33,7 @@ which curl jq
 npm install -g @moonpay/cli
 mp login
 
-# Optional: production API key (free shared key included in skill.json)
-export YIELDS_API_KEY="..."   # from https://dashboard.yield.xyz
+export YIELDS_API_KEY="..."   # optional: get one at https://dashboard.yield.xyz
 ```
 
 ## Installation
@@ -94,11 +93,17 @@ Always fetch the yield schema before executing — it specifies required params 
 ### 4. Sign with MoonPay
 
 ```bash
-# Sign and broadcast the unsigned transaction
-mp transaction send \
+# Step 1: Sign the unsigned transaction
+mp transaction sign \
   --wallet "yield-agent" \
   --chain base \
   --transaction '<unsignedTransaction from step 3>'
+# → returns signedTransaction JSON
+
+# Step 2: Broadcast the signed transaction
+mp transaction send \
+  --chain base \
+  --transaction '<signedTransaction from step 1>'
 ```
 
 For multi-step transactions, execute in `stepIndex` order. Sign each step exactly as returned — never modify `unsignedTransaction`.
@@ -159,7 +164,7 @@ mp token bridge \
 mp virtual-account create && mp virtual-account kyc submit
 mp virtual-account bank-account add
 mp virtual-account onramp create \
-  --amount 10000 --currency usd --chain ethereum --wallet <eth-address>
+  --name "yield-onramp" --fiat usd --stablecoin usdc --chain ethereum --wallet <eth-address>
 ```
 
 ### Check Balances / Withdraw
@@ -174,7 +179,7 @@ mp virtual-account offramp create --amount 2000 --chain ethereum --wallet <eth-a
 yield.xyz only builds unsigned transactions — your MoonPay wallet handles all signing. Keys are AES-256-GCM encrypted locally and never leave the machine. For large positions use a hardware wallet:
 
 ```bash
-mp wallet add-ledger --name "yield-ledger"
+mp wallet hardware add --name "yield-ledger"
 ```
 
 ## End-to-End Workflow
@@ -185,7 +190,7 @@ mp wallet add-ledger --name "yield-ledger"
 4. `./scripts/find-yields.sh base USDC`
 5. `./scripts/get-yield-info.sh <yield-id>`
 6. `./scripts/enter-position.sh <yield-id> <address> '{"amount":"500"}'`
-7. `mp transaction send --wallet "yield-agent" --chain base --transaction <tx>`
+7. `mp transaction sign --wallet "yield-agent" --chain base --transaction <unsignedTx>` then `mp transaction send --chain base --transaction <signedTx>`
 8. `./scripts/check-portfolio.sh <yield-id> <address>`
 9. `mp virtual-account offramp create` to withdraw earned yield
 
