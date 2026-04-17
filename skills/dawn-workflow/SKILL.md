@@ -1,5 +1,5 @@
 ---
-name: dawn
+name: dawn-workflow
 description: Runs a complete local Dawn strategy workflow — authenticate, research markets with SDK tools, generate Python strategy code, launch background runs, monitor logs, and stop strategies. Use when the user asks to create, launch, monitor, or manage trading strategies using dawn-cli.
 tags: [trading, strategy, operations, prediction-market]
 metadata:
