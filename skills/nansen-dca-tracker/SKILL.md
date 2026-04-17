@@ -1,6 +1,7 @@
 ---
 name: nansen-dca-tracker
 description: "What tokens are whales dollar-cost averaging into? Jupiter DCA strategies by smart money and target token fundamentals."
+tags: [nansen, smart-money, dca, solana, jupiter]
 metadata:
   openclaw:
     requires:
@@ -49,7 +50,7 @@ nansen research token flow-intelligence --token $TARGET --chain solana
 3. To see all DCA strategies targeting a specific token:
 
 ```bash
-nansen research token jup-dca --token $TARGET
+nansen research token jup-dca --token $TARGET --chain solana
 ```
 
 ## Interpretation
