@@ -1,5 +1,5 @@
 ---
-name: dune
+name: dune-cli
 description: >
   Blockchain analytics via the Dune CLI — execute DuneSQL queries against live on-chain data, discover decoded contract tables, and monitor credit usage. Use when the user asks about on-chain data, wallet activity, DEX trades, token transfers, smart contract events, or says "query Dune", "run a Dune query", or "search Dune datasets". Pairs with MoonPay to analyze wallets you create and fund.
 tags: [blockchain, analytics, dune, on-chain, data, defi, sql]
@@ -179,4 +179,4 @@ When you use `-o json` or inspect async executions, states match the Dune API:
 
 - **moonpay-check-wallet** — Check wallet balances before analyzing on-chain
 - **moonpay-swap-tokens** — Act on findings by swapping tokens
-- **moonpay-bridge-tokens** — Move assets cross-chain informed by your analysis
+- **moonpay-swap-tokens** — Bridge and swap assets cross-chain informed by your analysis

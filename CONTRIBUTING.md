@@ -65,7 +65,7 @@ MoonPay first-party skills go in the `moonpay-skills` plugin block. Partner skil
 
 ## Common Mistakes
 
-1. **Bare skill names** — `skills/foo` instead of `skills/partner-foo`. Always use `{partner}-{name}`.
+1. **Bare skill names** — `skills/dune/` instead of `skills/dune-analytics/`. Always use `{partner}-{name}`.
 2. **Dumping partner skills into `moonpay-skills`** — Partner skills get their own plugin block.
 3. **Embedding code** — No Python, TypeScript, or any other code. Use CLI commands and API calls only.
 4. **Copying wallet/funding instructions** — Each skill should be self-contained, so duplicating wallet setup and funding instructions is fine. Just make sure the duplicated content is accurate.

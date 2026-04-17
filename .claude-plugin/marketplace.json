@@ -79,12 +79,12 @@
       ]
     },
     {
-      "name": "dune",
+      "name": "dune-skills",
       "description": "Blockchain analytics via the Dune CLI — DuneSQL queries against live on-chain data",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/dune"
+        "./skills/dune-cli"
       ]
     },
     {

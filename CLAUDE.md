@@ -35,7 +35,7 @@ The body contains instructions for the agent: setup commands, workflows, configu
 ## Naming Convention
 
 - MoonPay skills: `skills/moonpay-{name}/` (e.g., `moonpay-swap-tokens`)
-- Partner skills: `skills/{partner}-{name}/` (e.g., `corbits-marketplace`, `dune`)
+- Partner skills: `skills/{partner}-{name}/` (e.g., `corbits-marketplace`, `dune-analytics`)
 
 ## Key Conventions
 
