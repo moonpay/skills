@@ -1,5 +1,5 @@
 ---
-name: metaplex
+name: metaplex-development
 description: Metaplex development on Solana — NFTs, tokens, compressed NFTs, candy machines, token launches, autonomous agents. Use when working with Token Metadata, Core, Bubblegum, Candy Machine, Genesis, Agent Registry, or the mplx CLI.
 tags: [solana, nft, token-metadata, compressed-nfts, candy-machine, token-launch, agent-identity, bubblegum]
 license: Apache-2.0
