@@ -9,9 +9,36 @@ permissions:
   pull-requests: read
 
 jobs:
-  enforce:
+  verify-bypass:
+    # Runs only when the bypass label is present. Fails the check unless the
+    # label was applied by someone with write/maintain/admin permission.
+    # Defense in depth: even if GitHub label permissions ever drift, the
+    # bypass can't be abused by contributors.
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'allow-infra-change') }}
     runs-on: ubuntu-latest
+    steps:
+      - name: Verify label applier has write permission
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+
+          perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
+          echo "Actor: $ACTOR, permission: $perm"
+
+          case "$perm" in
+            admin|maintain|write) echo "Bypass authorized. ✓" ;;
+            *)
+              echo "::error::User '$ACTOR' does not have write permission — cannot bypass skills-only check."
+              exit 1
+              ;;
+          esac
+
+  enforce:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'allow-infra-change') }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check changed files
         env:
