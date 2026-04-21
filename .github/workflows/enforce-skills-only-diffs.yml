@@ -1,0 +1,53 @@
+name: Enforce skills-only diffs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'allow-infra-change') }}
+    steps:
+      - name: Check changed files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" --jq '.[].filename')
+
+          bad=()
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              *.md) ;;
+              .claude-plugin/marketplace.json) ;;
+              *) bad+=("$f") ;;
+            esac
+          done <<< "$files"
+
+          if [ ${#bad[@]} -gt 0 ]; then
+            echo "::error::This PR touches files outside the allowed set."
+            echo ""
+            echo "Only these changes are permitted in contributor PRs:"
+            echo "  - *.md files (SKILL.md, references, docs)"
+            echo "  - .claude-plugin/marketplace.json"
+            echo ""
+            echo "Disallowed files in this PR:"
+            for f in "${bad[@]}"; do
+              echo "  - $f"
+            done
+            echo ""
+            echo "If you need to change CI, scripts, LICENSE, or other infrastructure,"
+            echo "a maintainer can add the 'allow-infra-change' label to bypass this check."
+            exit 1
+          fi
+
+          echo "All changed files are within the allowed set. ✓"
