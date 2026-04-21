@@ -154,6 +154,15 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "zyfai-skills",
+      "description": "DeFi yield via Zyfai — earn passive yield on MoonPay wallets through automated subaccounts on Base, Arbitrum, and Plasma.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/zyfai-yield"
+      ]
     }
   ]
 }
