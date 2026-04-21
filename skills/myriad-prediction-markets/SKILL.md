@@ -210,10 +210,7 @@ mp token balance list --wallet <bnb-address> --chain bsc
 
 ```bash
 mp virtual-account offramp create \
-  --name "Offramp" \
-  --bankAccountId <bank-account-id> \
-  --stablecoin usdc \
-  --chain bsc
+  --amount 200 --chain bsc --wallet <bnb-address>
 ```
 
 ## End-to-End Workflow
