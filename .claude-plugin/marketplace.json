@@ -136,6 +136,15 @@
         "./skills/alchemy-agentic-gateway",
         "./skills/alchemy-api"
       ]
+    },
+    {
+      "name": "nansen-skills",
+      "description": "Nansen on-chain analytics — smart money DCA tracking, wallet labels, token flow intelligence, and whale activity on Solana.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/nansen-dca-tracker"
+      ]
     }
   ]
 }
