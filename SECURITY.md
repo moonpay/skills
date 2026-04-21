@@ -19,15 +19,35 @@ When testing, please make a good faith effort to avoid:
 
 Only interact with accounts you own or accounts for which you have explicit permission from the account holder.
 
+## Scope: What This Repository Is
+
+This repository contains **Agent Skills** — markdown instruction files that AI agents load to perform tasks. Skills are not code, they are not a runtime, and they are not a security boundary. All execution happens through the MoonPay CLI (`mp`) and third-party CLIs, within the agent harness's permission and approval system (Claude Code, Cursor, etc.).
+
+The agent harness — not the skill file — is responsible for:
+- Prompt injection defense and instruction integrity
+- Tool call approval and confirmation flows
+- Sandboxing and permission boundaries
+- Preventing agents from acting on injected instructions in untrusted data
+
 ## Exclusions
 
 While researching, please follow the defined [program scope](https://hackerone.com/moonpay?type=team#program_highlights).
 Failure to do so may result in rejection of the submission.
 
 The following are out of scope:
+
+### General
 - Denial of service (DoS)
 - Spamming
 - Social engineering (including phishing) of MoonPay staff or contractors
+
+### AI Agent and Skill-Specific Exclusions
+- **Prompt injection and agent behavior manipulation** — Skills are consumed by agent harnesses that enforce their own trust boundaries. Reports that untrusted data could influence agent behavior, or that an agent could be tricked into overriding its instructions, are agent harness concerns.
+- **Missing natural-language guardrails** — Natural-language instructions to an LLM are not security controls. Suggestions to add defensive phrasing to skill markdown do not mitigate prompt injection.
+- **Cosmetic or display-layer injection** — Manipulation of terminal output, exported file formats, or rendered content via untrusted data. These are display-layer concerns outside this repository's scope.
+- **Theoretical attack chains** — Attacks requiring multiple preconditions where the core dependency is the agent harness failing its own security controls (e.g., bypassing confirmation flows, ignoring approval gates).
+- **Vulnerabilities in third-party tools or APIs** — Skills document how to use external tools; they do not own them. Report issues in third-party software to the respective vendor.
+- **Best-practice recommendations without demonstrated impact** — Reports suggesting a more secure pattern without demonstrating concrete, exploitable impact are informational, not vulnerabilities.
 
 ## Safe Harbor
 
