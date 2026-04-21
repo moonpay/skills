@@ -1,3 +1,4 @@
+<!-- Advisory: This file is for human developers integrating Metaplex SDK directly. Agents should use the `mplx` CLI commands in SKILL.md — not the SDK snippets below. -->
 # Metaplex Genesis SDK Reference
 
 Genesis is a token launch protocol for Token Generation Events (TGEs) on Solana with fair distribution and liquidity graduation.

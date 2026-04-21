@@ -1,3 +1,4 @@
+<!-- Advisory: This file is for human developers integrating Metaplex SDK directly. Agents should use the `mplx` CLI commands in SKILL.md — not the SDK snippets below. -->
 # Token Metadata Kit SDK Reference
 
 Native @solana/kit integration for Token Metadata - direct SDK control with minimal dependencies.

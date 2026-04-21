@@ -1,3 +1,4 @@
+<!-- Advisory: This file is for human developers integrating Metaplex SDK directly. Agents should use the `mplx` CLI commands in SKILL.md — not the SDK snippets below. -->
 # Token Metadata SDK Reference (Umi)
 
 Umi SDK operations for creating and managing Token Metadata NFTs, pNFTs, and fungible tokens.

@@ -1,3 +1,4 @@
+<!-- Advisory: This file is for human developers integrating Metaplex SDK directly. Agents should use the `mplx` CLI commands in SKILL.md — not the SDK snippets below. -->
 # Metaplex Umi SDK Reference
 
 Umi is Metaplex's modular JavaScript framework for Solana program clients.
