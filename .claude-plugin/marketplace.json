@@ -41,6 +41,15 @@
       ]
     },
     {
+      "name": "yield-skills",
+      "description": "Multi-chain yield optimization via Yield.xyz and StakeKit",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/yield-optimization"
+      ]
+    },
+    {
       "name": "shipp-skills",
       "description": "Real-time sports data for prediction market agents via Shipp API",
       "source": "./",
