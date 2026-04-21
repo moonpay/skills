@@ -100,3 +100,15 @@ perp bot quick-grid SOL -e hyperliquid
 - [perp-portfolio](../perp-portfolio/) — view positions and PnL across all exchanges
 - [perp-arb](../perp-arb/) — scan and execute funding rate arbitrage
 - [moonpay-check-wallet](../moonpay-check-wallet/) — check wallet balances before funding
+
+## Security & Risk
+
+**Leverage warning:** Leveraged positions can result in 100% loss of margin if the price moves against you. Always set a stop-loss before entering leveraged trades:
+```bash
+perp trade tpsl <symbol> <buy|sell>   # set take-profit and stop-loss levels
+```
+Start with 1x leverage (`--leverage 1`) and increase only once familiar with the platform.
+
+**Liquidation:** If margin utilization exceeds the exchange threshold (~80-90%), your position will be force-closed. Monitor with `perp account positions` and `perp status`.
+
+**Private key storage:** `perp setup` stores your private key locally (encrypted). Location varies by OS — run `perp setup --help` to see the config path. Never share your key or commit it to version control. To rotate: run `perp setup` again and overwrite.
