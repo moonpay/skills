@@ -20,7 +20,7 @@ mp token search --query "BONK" --chain solana
 mp token retrieve --token <mint-address> --chain solana
 
 # See what's trending
-mp token trending list --chain solana
+mp token trending list --chain solana --limit 5 --page 1
 ```
 
 ## Supported chains
