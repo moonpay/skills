@@ -289,20 +289,6 @@ Settlement is asynchronous. The HTTP 200 is returned as soon as the payment sign
 
 The `PAYMENT-RESPONSE` header in the 200 response contains the settlement transaction hash — this is the proof of payment to show the user.
 
-### Amount conversion
-
-USDC has 6 decimals: `minimalUnits = USD × 1_000_000`.
-
-| USD | Minimal units |
-|---|---|
-| $1.00 | `1000000` |
-| $3.00 | `3000000` |
-| $5.00 | `5000000` |
-| $10.00 | `10000000` |
-| $100.00 | `100000000` |
-
-Default example amount for first-time or demo runs: **$3** (`amount=3000000`).
-
 ### Example: paying a paylink
 
 User says: _"Pay for the DEX Screener Token Boost at `https://api.hel.io/v1/x402/checkout/abc123` — use $10."_
