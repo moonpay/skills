@@ -124,7 +124,9 @@ Both `mp x402 request` (MoonPay CLI) and any x402-compatible client library hand
 |---|---|---|
 | `POST` | `/v1/x402/checkout/{paylinkId}` | One-time checkout payment |
 | `POST` | `/v1/x402/deposit/{depositId}` | Recurring / balance-based deposit payment |
+| `POST` | `/v1/x402/checkout/charge/{chargeToken}` | Settle an in-flight Shopify-source Charge (created when the buyer selected Solana Pay at the Shopify checkout) |
 | `GET` | `/v1/paylink/{id}/public` | Fetch public product metadata (requires `Origin` header) |
+| `GET` | `/v1/charge/{chargeToken}` | Fetch Charge state — use after settlement to confirm payment status |
 | `GET` | `/v1/health` | Health check — returns `{"status":"ok"}` |
 
 ### Prerequisites
@@ -201,6 +203,22 @@ mp x402 request \
   --wallet <wallet-name> \
   --chain <chain>
 ```
+
+#### Charge resume (Shopify-source paylinks)
+
+When a Shopify buyer selects Solana Pay at checkout, Shopify POSTs `/payment` to the MoonPay Commerce backend, which creates an **in-flight Charge** with a `chargeToken` (UUID) and a price derived from the cart. An agent settles that existing Charge — instead of creating a parallel one — by hitting:
+
+```bash
+mp x402 request \
+  --method POST \
+  --url "https://api.hel.io/v1/x402/checkout/charge/<chargeToken>?payerAddress=<YOUR_WALLET_ADDRESS>" \
+  --wallet <wallet-name> \
+  --chain solana
+```
+
+- The amount is **derived from the Charge** (`Charge.usdcAmount`) — do **not** append `?amount=` for charge-resume requests.
+- Currently **Solana-only**; EVM (Base / Polygon / Arbitrum / BSC) is on the roadmap.
+- On HTTP 200, settlement is fire-and-forget: the server creates the `PaylinkTx`, links it to the Charge, and triggers Shopify's `paymentSessionResolveMutation` to flip the order to paid in the merchant admin. The `txSignature` is **not** returned in the 200 body — confirm it via `GET /v1/charge/{chargeToken}` (see "Verifying payment status" below).
 
 #### Before running any `mp x402 request`
 
@@ -280,7 +298,11 @@ If a chain's gas cost spikes beyond its threshold, the server excludes it from `
 | **403** | `PAYLINK_SANCTIONED` | Abort — access restricted; do not retry |
 | **403** | Payer mismatch | Signed payer address doesn't match provisioned identity; verify wallet |
 | **404** | Paylink not found | Verify the paylink ID or URL is correct |
+| **404** | `CHARGE_NOT_FOUND` (charge-resume) | The `chargeToken` does not match an in-flight Charge — re-trigger the Shopify checkout to mint a new one |
+| **400** | `CHARGE_NON_SHOPIFY` (charge-resume) | The Charge isn't Shopify-source; use `/v1/x402/checkout/{paylinkId}` instead |
 | **409** | Settlement in progress | A payment for this tx is already being settled; do not re-submit |
+| **409** | `CHARGE_ALREADY_SETTLED` (charge-resume) | The Charge is already paid — confirm via `GET /v1/charge/{chargeToken}` and surface the existing tx |
+| **410** | `CHARGE_EXPIRED` (charge-resume) | The Charge expired before settlement — re-trigger the Shopify checkout |
 | **429** | Rate limited | Back off — 10 requests per 60 seconds per IP |
 
 ### Settlement behavior
@@ -288,6 +310,24 @@ If a chain's gas cost spikes beyond its threshold, the server excludes it from `
 Settlement is asynchronous. The HTTP 200 is returned as soon as the payment signature is verified. The on-chain sweep from the deposit wallet to the merchant happens in the background (typically 30–120s).
 
 The `PAYMENT-RESPONSE` header in the 200 response contains the settlement transaction hash — this is the proof of payment to show the user.
+
+For the **charge-resume** flow (`POST /v1/x402/checkout/charge/{chargeToken}`), settle is fire-and-forget and the 200 body does not carry the on-chain signature. Always confirm payment status by polling `GET /v1/charge/{chargeToken}` after the 200 (see below).
+
+### Verifying payment status
+
+At the end of every x402 payment, confirm the Charge has reached a terminal paid state by calling:
+
+```bash
+curl -s "https://api.hel.io/v1/charge/<chargeToken>"
+```
+
+Use this to:
+
+- Confirm the `PaylinkTx` was created and linked to the Charge.
+- Read the on-chain `txSignature` for the charge-resume flow (where it isn't returned in the 200 body).
+- Detect settlement failures the 200 response can't surface (e.g. background sweep reverted, Shopify resolve failed).
+
+Recommended polling: poll once immediately after the 200, then every 5–10s for up to ~120s. Stop polling as soon as the Charge shows a paid/settled state with a transaction signature attached. Surface the settlement tx hash to the user only after this confirmation — do **not** rely on the HTTP 200 alone for the charge-resume flow.
 
 ### Example: paying a paylink
 
@@ -333,16 +373,18 @@ Before executing any payment, verify:
 - [ ] `?payerAddress=<wallet>` is included in the URL
 - [ ] Amount is correct — in minimal units (6 decimals), matches the product price
 - [ ] User has explicitly confirmed: product name, amount, chain, and wallet
+- [ ] After settlement, payment status is confirmed via `GET /v1/charge/{chargeToken}` (mandatory for charge-resume; recommended for all flows)
 
 ### Custom client integration
 
 Any x402-compatible HTTP client works with MoonPay Commerce endpoints. The client must:
 
-1. Send an initial `POST` to the checkout/deposit endpoint with `?payerAddress=<address>`
+1. Send an initial `POST` to the checkout/deposit/charge endpoint with `?payerAddress=<address>`
 2. Parse the `PAYMENT-REQUIRED` response header (Base64-encoded JSON) to extract: network, amount, payTo address, asset
 3. Sign and submit the on-chain payment transaction (EIP-3009 `transferWithAuthorization` for EVM; SPL token transfer for Solana)
 4. Retry the same `POST` with the signed proof in the `PAYMENT-SIGNATURE` header
-5. Read `PAYMENT-RESPONSE` header from the 200 response for the settlement tx hash
+5. Read `PAYMENT-RESPONSE` header from the 200 response for the settlement tx hash (paylink/deposit flows only)
+6. Poll `GET /v1/charge/{chargeToken}` to confirm the Charge reached a paid/settled state and to retrieve the on-chain `txSignature` (mandatory for the charge-resume flow; recommended for all flows)
 
 ```
 POST https://api.hel.io/v1/x402/checkout/{paylinkId}?payerAddress={address}
