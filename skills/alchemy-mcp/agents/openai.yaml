@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alchemy MCP"
+  short_description: "Live agent access to Alchemy via MCP (no API key, no install)"
+  default_prompt: "Connect to the Alchemy MCP server, select my app, and run a live blockchain query."

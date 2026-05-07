@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alchemy Agentic Gateway"
+  short_description: "App-code Alchemy access via x402 or MPP, no API key needed"
+  default_prompt: "Build an app that uses the Alchemy gateway with wallet-based auth and per-request payments — guide me through x402 vs MPP."

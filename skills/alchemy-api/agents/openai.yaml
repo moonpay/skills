@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alchemy API"
+  short_description: "Wire Alchemy into app code with a standard API key"
+  default_prompt: "Use Alchemy's API key flow to build an app with RPC, Data APIs, Webhooks, or Wallet APIs."
