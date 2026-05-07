@@ -102,6 +102,17 @@ Pay for products on [MoonPay Commerce](https://www.moonpay.com/en-gb/newsroom/mo
 - The user supplies a MoonPay Commerce paylink URL (`https://api.hel.io/v1/x402/checkout/<id>` or a merchant product URL resolving to one)
 - The user asks to buy, tip, pay, or subscribe to a product powered by MoonPay Commerce
 - An agent is operating autonomously and encounters an `https://api.hel.io` x402 endpoint
+- The user asks to pay for a **charge** and supplies a UUID like `6d0a1c57-3544-42e2-aa44-b654077c7529` — that's a `chargeToken`, not a paylink ID. Route it to the charge-resume endpoint (`POST /v1/x402/checkout/charge/{chargeToken}`); do **not** try it against `/checkout/{paylinkId}`, `/deposit/{depositId}`, or `/v1/paylink/{id}/public` — those will return 404.
+
+### Identifier routing cheat-sheet
+
+| User says | ID looks like | Endpoint |
+|---|---|---|
+| "pay this paylink", supplies a paylink URL or short ID | short slug or trailing path segment of `https://app.hel.io/pay/<id>` | `POST /v1/x402/checkout/{paylinkId}` |
+| "top up / deposit", supplies a deposit ID | depositId from the merchant | `POST /v1/x402/deposit/{depositId}` |
+| "pay this charge", or supplies a UUID v4 (e.g. `6d0a1c57-3544-42e2-aa44-b654077c7529`) | `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx` (UUID) | `POST /v1/x402/checkout/charge/{chargeToken}` |
+
+When the supplied ID is a UUID and you can't tell from context, default to the charge-resume endpoint. A 404 from the charge endpoint with `CHARGE_NOT_FOUND` is the signal that it really is a different ID type — only then fall back to checkout/deposit/paylink.
 
 ### Protocol overview
 
