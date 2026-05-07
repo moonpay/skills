@@ -1,6 +1,6 @@
 ---
 name: moonpay-commerce
-description: Browse Solana Pay-enabled Shopify stores, manage a cart, and checkout with crypto — or pay any MoonPay Commerce (Helio) paylink directly via the x402 protocol with USDC across Base, Ethereum, Polygon, Arbitrum, BSC, and Solana. Use when the user supplies a paylink URL (https://api.hel.io/v1/x402/...) or asks to buy/tip/subscribe via MoonPay Commerce.
+description: Browse Solana Pay-enabled Shopify stores, manage a cart, and checkout with crypto — or pay any MoonPay Commerce (Helio) paylink, deposit, or charge directly via the x402 protocol with USDC across Base, Ethereum, Polygon, Arbitrum, BSC, and Solana. Use when the user supplies any hel.io URL (paylink at https://api.hel.io/v1/x402/..., charge at https://moonpay.hel.io/charge/<uuid>, https://app.hel.io/charge/<uuid>, or https://api.hel.io/v1/charge/<uuid>), supplies a bare UUID with the word "charge", or asks to buy/tip/subscribe/pay-charge via MoonPay Commerce. **Load this skill before calling moonpay or pay tools whenever the user is paying anything Helio-related — the routing rules below decide which endpoint to hit.**
 tags: [commerce, shopping, payments, x402, agent-payments]
 ---
 
@@ -102,17 +102,28 @@ Pay for products on [MoonPay Commerce](https://www.moonpay.com/en-gb/newsroom/mo
 - The user supplies a MoonPay Commerce paylink URL (`https://api.hel.io/v1/x402/checkout/<id>` or a merchant product URL resolving to one)
 - The user asks to buy, tip, pay, or subscribe to a product powered by MoonPay Commerce
 - An agent is operating autonomously and encounters an `https://api.hel.io` x402 endpoint
-- The user asks to pay for a **charge** and supplies a UUID like `6d0a1c57-3544-42e2-aa44-b654077c7529` — that's a `chargeToken`, not a paylink ID. Route it to the charge-resume endpoint (`POST /v1/x402/checkout/charge/{chargeToken}`); do **not** try it against `/checkout/{paylinkId}`, `/deposit/{depositId}`, or `/v1/paylink/{id}/public` — those will return 404.
+- The user asks to pay for a **charge** — typically a URL like `https://moonpay.hel.io/charge/<UUID>`, `https://app.hel.io/charge/<UUID>`, or just a bare UUID such as `6d0a1c57-3544-42e2-aa44-b654077c7529`. A UUID by itself is a `chargeToken`, **not** a `paylinkId` and **not** a `depositId`.
 
 ### Identifier routing cheat-sheet
 
-| User says | ID looks like | Endpoint |
-|---|---|---|
-| "pay this paylink", supplies a paylink URL or short ID | short slug or trailing path segment of `https://app.hel.io/pay/<id>` | `POST /v1/x402/checkout/{paylinkId}` |
-| "top up / deposit", supplies a deposit ID | depositId from the merchant | `POST /v1/x402/deposit/{depositId}` |
-| "pay this charge", or supplies a UUID v4 (e.g. `6d0a1c57-3544-42e2-aa44-b654077c7529`) | `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx` (UUID) | `POST /v1/x402/checkout/charge/{chargeToken}` |
+A bare UUID is **never** the right input for `/checkout/{paylinkId}`, `/deposit/{depositId}`, or `/v1/paylink/{id}/public` — all of those expect short merchant-issued IDs and will 404 on a UUID.
 
-When the supplied ID is a UUID and you can't tell from context, default to the charge-resume endpoint. A 404 from the charge endpoint with `CHARGE_NOT_FOUND` is the signal that it really is a different ID type — only then fall back to checkout/deposit/paylink.
+| What the user supplies | First step | Settle endpoint |
+|---|---|---|
+| Paylink URL or short slug (e.g. `app.hel.io/pay/<slug>`) | optional `GET /v1/paylink/{paylinkId}/public` | `POST /v1/x402/checkout/{paylinkId}` |
+| Deposit ID from a merchant | — | `POST /v1/x402/deposit/{depositId}` |
+| **Bare UUID** or a `…/charge/<UUID>` URL | **`GET /v1/charge/{chargeToken}` first** — read the Charge to decide where to settle | see "Routing a charge" below |
+
+#### Routing a charge
+
+Charges come in **two flavors** and the right settle endpoint depends on which:
+
+1. `GET https://api.hel.io/v1/charge/<chargeToken>` to fetch the Charge.
+2. Inspect the response:
+   - **Shopify-source charge** — the Charge has `shopifyPaymentDetails` populated (set by `ShopifyPaymentChargeService` when Shopify POSTed `/payment` after the buyer chose Solana Pay). Settle via `POST /v1/x402/checkout/charge/<chargeToken>`. Solana-only.
+   - **Non-Shopify (paylink-backed) charge** — no `shopifyPaymentDetails`; the Charge is linked to a regular paylink. Read the paylink ID from the Charge (`paylink._id` / `paylink.id`) and settle via `POST /v1/x402/checkout/<paylinkId>` like a normal paylink payment. Multi-chain.
+
+> **Do not blindly POST a UUID to `/v1/x402/checkout/charge/<token>`.** If the Charge isn't Shopify-source the server returns 400 `CHARGE_NOT_SHOPIFY` with the message *"This endpoint only resumes Shopify-source charges. Use /x402/checkout/:paylinkId for generic agentic checkout."* Look up the Charge first; it's a single GET with no payment side-effect.
 
 ### Protocol overview
 
@@ -215,7 +226,9 @@ mp x402 request \
   --chain <chain>
 ```
 
-#### Charge resume (Shopify-source paylinks)
+#### Charge resume — Shopify-source charges only
+
+Use this **only** after `GET /v1/charge/<chargeToken>` confirms the Charge has `shopifyPaymentDetails`. For non-Shopify charges, route to `POST /v1/x402/checkout/{paylinkId}` instead (see "Routing a charge" above).
 
 When a Shopify buyer selects Solana Pay at checkout, Shopify POSTs `/payment` to the MoonPay Commerce backend, which creates an **in-flight Charge** with a `chargeToken` (UUID) and a price derived from the cart. An agent settles that existing Charge — instead of creating a parallel one — by hitting:
 
@@ -230,6 +243,20 @@ mp x402 request \
 - The amount is **derived from the Charge** (`Charge.usdcAmount`) — do **not** append `?amount=` for charge-resume requests.
 - Currently **Solana-only**; EVM (Base / Polygon / Arbitrum / BSC) is on the roadmap.
 - On HTTP 200, settlement is fire-and-forget: the server creates the `PaylinkTx`, links it to the Charge, and triggers Shopify's `paymentSessionResolveMutation` to flip the order to paid in the merchant admin. The `txSignature` is **not** returned in the 200 body — confirm it via `GET /v1/charge/{chargeToken}` (see "Verifying payment status" below).
+
+#### Charge → paylink fallback (non-Shopify charges)
+
+If `GET /v1/charge/<chargeToken>` returns a Charge **without** `shopifyPaymentDetails`, read the paylink ID from the response (typically `paylink._id` on the populated Charge / `paylink.id` on the enriched response) and settle as a normal paylink payment:
+
+```bash
+mp x402 request \
+  --method POST \
+  --url "https://api.hel.io/v1/x402/checkout/<paylinkIdFromCharge>?payerAddress=<YOUR_WALLET_ADDRESS>" \
+  --wallet <wallet-name> \
+  --chain <chain>
+```
+
+For dynamic-price paylinks the Charge already carries the price (`Charge.usdcAmount`); pass it through as `?amount=<minimalUnits>` so the user pays the same amount the original Charge requested.
 
 #### Before running any `mp x402 request`
 
@@ -309,8 +336,8 @@ If a chain's gas cost spikes beyond its threshold, the server excludes it from `
 | **403** | `PAYLINK_SANCTIONED` | Abort — access restricted; do not retry |
 | **403** | Payer mismatch | Signed payer address doesn't match provisioned identity; verify wallet |
 | **404** | Paylink not found | Verify the paylink ID or URL is correct |
-| **404** | `CHARGE_NOT_FOUND` (charge-resume) | The `chargeToken` does not match an in-flight Charge — re-trigger the Shopify checkout to mint a new one |
-| **400** | `CHARGE_NON_SHOPIFY` (charge-resume) | The Charge isn't Shopify-source; use `/v1/x402/checkout/{paylinkId}` instead |
+| **404** | `CHARGE_NOT_FOUND` (charge-resume) | The `chargeToken` does not match an in-flight Charge — confirm via `GET /v1/charge/{chargeToken}`; if that 404s too, re-trigger the upstream checkout |
+| **400** | `CHARGE_NOT_SHOPIFY` (charge-resume) | The Charge isn't Shopify-source. **Don't retry the charge-resume endpoint** — fetch the Charge via `GET /v1/charge/{chargeToken}`, read `paylink._id`, and settle via `POST /v1/x402/checkout/{paylinkId}` instead |
 | **409** | Settlement in progress | A payment for this tx is already being settled; do not re-submit |
 | **409** | `CHARGE_ALREADY_SETTLED` (charge-resume) | The Charge is already paid — confirm via `GET /v1/charge/{chargeToken}` and surface the existing tx |
 | **410** | `CHARGE_EXPIRED` (charge-resume) | The Charge expired before settlement — re-trigger the Shopify checkout |
