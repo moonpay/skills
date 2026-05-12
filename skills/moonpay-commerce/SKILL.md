@@ -112,11 +112,11 @@ A bare UUID is **never** the right input for `/checkout/{paylinkId}`, `/deposit/
 |---|---|---|
 | Paylink URL or short slug (e.g. `app.hel.io/pay/<slug>`) | optional `GET /v1/paylink/{paylinkId}/public` | `POST /v1/x402/checkout/{paylinkId}` |
 | Deposit ID from a merchant | — | `POST /v1/x402/deposit/{depositId}` |
-| **Bare UUID** or a `…/charge/<UUID>` URL | **`GET /v1/charge/{chargeToken}` first** — read `shopifyPaymentDetails`, `source`, `windowClosed`, `paylink.id`, `paylinkTxs` | see "Routing a charge" below — **do not pre-announce "Shopify-source" or any routing choice before this GET completes** |
+| **Bare UUID** or a `…/charge/<UUID>` URL | **`GET /v1/charge/{chargeToken}` first** — read `paylinkTxs`, `windowClosed`, `paylink.id` | see "Routing a charge" below — charge-resume is the default for any non-expired, non-settled Charge **regardless of `source`** |
 
 #### Routing a charge
 
-> **Do not announce a routing decision before you've fetched the Charge.** "This is a Shopify-source Charge → charge-resume" is the most common premature framing — and it's wrong for ~every non-Shopify charge (CoinMarketCap boost, generic API-issued charges, `paylink`-source charges, etc.). Route only after the GET, and narrate to the user in terms of what the metadata actually says.
+> **The intent is always: settle the original Charge token so `GET /v1/charge/<token>` flips to paid.** `POST /v1/x402/checkout/charge/<chargeToken>` is the only path that does this — it creates the `PaylinkTx` *and* links it back to the Charge (`paylinkTxs` becomes non-empty, `paylinkTx` becomes non-null). It works for every `source` — `shopify`, `api` (e.g. CoinMarketCap boost), `paylink`, `x402`. There is no longer a "Shopify-only" restriction on this endpoint.
 
 **Step 1 — fetch the Charge** (no payment side-effect, just a read):
 
@@ -124,28 +124,15 @@ A bare UUID is **never** the right input for `/checkout/{paylinkId}`, `/deposit/
 curl -s "https://api.hel.io/v1/charge/<chargeToken>"
 ```
 
-**Step 2 — inspect three fields** to decide the route:
+**Step 2 — decision rules, in order:**
 
-| Field | Possible values | What it tells you |
-|---|---|---|
-| `shopifyPaymentDetails` | object \| absent | The **only** field the charge-resume endpoint actually keys off. If absent, charge-resume returns 400 `CHARGE_NOT_SHOPIFY`. |
-| `source` | `"api"` / `"paylink"` / `"x402"` (`ChargeSource` enum) | Where the Charge originated. `api` is typical for backend-issued charges (CoinMarketCap boost, billing systems, Solana Pay on Shopify). Narrate this back to the user. |
-| `windowClosed` | `true` / `false` | Whether the original deposit window has expired. `true` means the issuing system has stopped waiting for this token to settle — see the orphan warning below. |
+1. **`paylinkTxs` non-empty** → Charge is already settled. Do not pay again. Surface the linked transaction from the GET response.
+2. **`windowClosed: true`** → Charge expired. **Stop.** Tell the user the original window has closed and ask the merchant to re-issue a Charge with a fresh window. Do **not** auto-route to the paylink endpoint — that orphans the payment (see "Paylink-direct as last resort"). Only proceed with paylink-direct if the user has explicitly consented to an orphan payment after being told the merchant cannot re-issue.
+3. **Otherwise** → `POST /v1/x402/checkout/charge/<chargeToken>` (currently Solana-only; EVM on the roadmap). Settles the Charge in place — works for any `source`.
 
-**Step 3 — pick the endpoint:**
+> **No auto-fallback on charge-resume failure.** If `POST /v1/x402/checkout/charge/<chargeToken>` fails — for **any** reason (`CHARGE_EXPIRED`, `CHARGE_ALREADY_SETTLED`, `CHARGE_NOT_FOUND`, 5xx, on-chain revert, etc.) — **do not silently retry against `/v1/x402/checkout/<paylink.id>`.** Settling the paylink mints a *fresh* on-chain payment that is not linked to the original `chargeToken`: the original stays unpaid (issuing system still sees it unsettled), and you've spent the user's funds on an orphan transaction. Stop, report the failure to the user, and only consider "Paylink-direct as last resort" with explicit user consent.
 
-| Charge looks like | Settle via |
-|---|---|
-| `shopifyPaymentDetails` populated, `windowClosed: false` | `POST /v1/x402/checkout/charge/<chargeToken>` (Solana-only) |
-| `shopifyPaymentDetails` absent, `windowClosed: false`, has `paylink.id` | `POST /v1/x402/checkout/<paylink.id>` — settles the underlying paylink. **The PaylinkTx is not linked back to this Charge token** (see warning). |
-| `windowClosed: true` (any source) | `POST /v1/x402/checkout/<paylink.id>` — but **the original Charge token will never be marked settled** (see warning). Confirm with the user before proceeding, or recommend the merchant re-issues a Charge with a fresh window. |
-| `paylinkTxs` non-empty | Already settled — `GET /v1/charge/<chargeToken>` returns the linked transaction; do not pay again. |
-
-> **Orphan-PaylinkTx warning.** Paying the underlying paylink (any time you're not on the charge-resume endpoint) creates a fresh on-chain payment for the same product/amount, but the new `PaylinkTx` is **not** linked back to the original Charge token. If the issuing system (CMC, a billing flow, etc.) is waiting on **that specific token** to flip to paid, it will continue to see it as unpaid. Surface this to the user before spending. Use `GET /v1/charge/<chargeToken>` after payment to confirm — `paylinkTxs` on the original Charge will still be empty.
-
-> **No auto-fallback on charge-resume failure.** If `POST /v1/x402/checkout/charge/<chargeToken>` fails — for **any** reason (`CHARGE_NOT_SHOPIFY`, `CHARGE_EXPIRED`, `CHARGE_ALREADY_SETTLED`, 5xx, on-chain revert, etc.) — **do not silently retry against `/v1/x402/checkout/<paylink.id>`.** Settling the paylink mints a *fresh* Charge that has nothing to do with the original `chargeToken`: the original stays unpaid (issuing system still sees it unsettled), and you've also spent the user's funds on an orphan transaction. Stop, report the failure to the user along with the orphan-PaylinkTx implication, and only proceed with the paylink endpoint if the user **explicitly** accepts that trade-off.
-
-> **`paylink.id` is the field name** in the `GET /v1/charge/<chargeToken>` response (e.g. `"paylink":{"id":"69fc6d95...","template":"PAYLINK_V2",...}`), not `paylink._id`.
+> **`paylink.id` is the field name** in the `GET /v1/charge/<chargeToken>` response (e.g. `"paylink":{"id":"69fc6d95...","template":"PAYLINK_V2",...}`), not `paylink._id`. You only need it for the explicit orphan escape hatch below.
 
 ### Protocol overview
 
@@ -248,11 +235,9 @@ mp x402 request \
   --chain <chain>
 ```
 
-#### Charge resume — only after the GET confirms `shopifyPaymentDetails`
+#### Charge resume — the default path for any Charge
 
-Use this **only** after `GET /v1/charge/<chargeToken>` returns a Charge with `shopifyPaymentDetails` populated **and** `windowClosed: false` **and** `paylinkTxs` empty. For every other case (no `shopifyPaymentDetails`, closed window, already settled), route to `POST /v1/x402/checkout/{paylinkId}` instead (see "Routing a charge" above) — and surface the orphan-PaylinkTx warning.
-
-When a Shopify buyer selects Solana Pay at checkout, Shopify POSTs `/payment` to the MoonPay Commerce backend, which creates an **in-flight Charge** with a `chargeToken` (UUID) and a price derived from the cart. An agent settles that existing Charge — instead of creating a parallel one — by hitting:
+Use this whenever the Charge is not expired (`windowClosed: false`) and not already settled (`paylinkTxs` empty), **regardless of `source`**. It works for Shopify Solana Pay, API-issued charges (CoinMarketCap token boost, billing systems, x402-issued charges), and `paylink`-source charges alike. The endpoint creates the `PaylinkTx` and links it back to the Charge so `GET /v1/charge/<token>` flips to a paid state.
 
 ```bash
 mp x402 request \
@@ -264,12 +249,44 @@ mp x402 request \
 
 - The amount is **derived from the Charge** (`Charge.usdcAmount`) — do **not** append `?amount=` for charge-resume requests.
 - Currently **Solana-only**; EVM (Base / Polygon / Arbitrum / BSC) is on the roadmap.
-- On HTTP 200, settlement is fire-and-forget: the server creates the `PaylinkTx`, links it to the Charge, and triggers Shopify's `paymentSessionResolveMutation` to flip the order to paid in the merchant admin. The `txSignature` is **not** returned in the 200 body — confirm it via `GET /v1/charge/{chargeToken}` (see "Verifying payment status" below).
-- **On failure, stop — do not auto-fall-back.** Any non-200 response from the charge-resume endpoint means the original Charge has not been settled. Silently retrying the same intent against `/v1/x402/checkout/<paylink.id>` does **not** rescue the original Charge — it mints a separate, orphan transaction while the original `chargeToken` stays unpaid. Report the error, surface the orphan-PaylinkTx implication, and only proceed with the paylink endpoint if the user explicitly accepts that the original Charge will remain unpaid (and the issuing system will need to reconcile manually or re-issue).
+- On HTTP 200, settlement is fire-and-forget: the server creates the `PaylinkTx` and links it to the Charge. For Shopify-source charges it also triggers Shopify's `paymentSessionResolveMutation` to flip the order to paid in the merchant admin. The `txSignature` is **not** returned in the 200 body — confirm it via `GET /v1/charge/{chargeToken}` (see "Verifying payment status" below).
+- **On failure, stop — do not auto-fall-back.** Any non-200 response (`CHARGE_EXPIRED`, `CHARGE_ALREADY_SETTLED`, `CHARGE_NOT_FOUND`, 5xx, on-chain revert) means the original Charge has not been settled. Silently retrying against `/v1/x402/checkout/<paylink.id>` does **not** rescue the original Charge — it mints a separate, orphan transaction while the original `chargeToken` stays unpaid. Report the error and only consider "Paylink-direct as last resort" below with explicit user consent.
 
-#### Charge → paylink fallback (non-Shopify charges, including `windowClosed`)
+**Worked example — API-source Charge with an open window** (e.g. CoinMarketCap token boost):
 
-If `GET /v1/charge/<chargeToken>` returns a Charge **without** `shopifyPaymentDetails` (typical when `source` is `api`, `paylink`, or `x402`), or with `windowClosed: true`, read the paylink ID from `paylink.id` in the response and settle as a normal paylink payment:
+```text
+GET /v1/charge/b2b41023-... →
+  source: "api"
+  windowClosed: false
+  shopifyPaymentDetails: <absent>
+  paylink: { id: "69fc6d95...", template: "PAYLINK_V2", ... }
+  usdcAmount: "3100000"
+  paylinkTxs: []
+```
+
+Routing decision: not expired, not settled → **charge-resume**. Source does not matter.
+
+```bash
+mp x402 request \
+  --method POST \
+  --url "https://api.hel.io/v1/x402/checkout/charge/b2b41023-...?payerAddress=<YOUR_WALLET_ADDRESS>" \
+  --wallet moonfi-xzhang \
+  --chain solana
+```
+
+After the 200, poll the Charge:
+
+```bash
+curl -s "https://api.hel.io/v1/charge/b2b41023-..." | jq '{paylinkTx, paylinkTxs}'
+```
+
+Expected result within ~10s — `paylinkTxs` populated and `paylinkTx` (singular) non-null. That is the canonical "paid" signal that the issuing system (CMC, billing, etc.) polls for.
+
+#### Paylink-direct as last resort (orphan payment)
+
+> **Do not enter this path automatically.** It exists only as an explicit escape hatch when (a) charge-resume failed with an irrecoverable error (typically `CHARGE_EXPIRED`), (b) the merchant has confirmed they cannot re-issue the Charge, and (c) the user has been told the consequences and explicitly consented to an orphan payment.
+
+If those three conditions are met, read the paylink ID from `paylink.id` in the GET response and pay the underlying paylink:
 
 ```bash
 mp x402 request \
@@ -280,31 +297,8 @@ mp x402 request \
 ```
 
 - For dynamic-price paylinks, pass `Charge.usdcAmount` through as `?amount=<minimalUnits>` so the user pays the same amount the original Charge requested.
-- **Always remind the user** that this creates a fresh PaylinkTx and does **not** retire the original `chargeToken`. If a third-party system (CMC, billing, Shopify, etc.) was watching that specific token, it will still see it as unpaid. Recommend the merchant re-issue a Charge with an open window if downstream reconciliation matters.
-
-**Worked example — API-source Charge with closed window** (e.g. CoinMarketCap token boost):
-
-```text
-GET /v1/charge/6d0a1c57-... →
-  source: "api"
-  windowClosed: true
-  shopifyPaymentDetails: <absent>
-  paylink: { id: "69fc6d95...", template: "PAYLINK_V2", ... }
-  usdcAmount: "3100000"
-  paylinkTxs: []
-```
-
-Routing decision: not Shopify-source (no `shopifyPaymentDetails`) AND window is closed → **paylink endpoint with orphan warning**:
-
-```bash
-mp x402 request \
-  --method POST \
-  --url "https://api.hel.io/v1/x402/checkout/69fc6d95...?amount=3100000&payerAddress=<YOUR_WALLET_ADDRESS>" \
-  --wallet moonfi-xzhang \
-  --chain solana
-```
-
-After settlement, `GET /v1/charge/6d0a1c57-...` will still show `paylinkTxs: []` — the original Charge token remains orphaned. The freshly-created PaylinkTx lives on the paylink, not on this Charge.
+- **Orphan-PaylinkTx consequence.** This creates a fresh on-chain payment for the same product/amount, but the new `PaylinkTx` is **not** linked back to the original Charge token. `GET /v1/charge/<chargeToken>` will continue to show `paylinkTxs: []` and `paylinkTx: null` even after a successful on-chain transfer. Any issuing system watching that specific token (CMC, billing, Shopify) will continue to see the Charge as unpaid — the merchant must reconcile manually.
+- Always state the orphan consequence to the user **before** spending and require explicit confirmation. Default response when in doubt is "stop and ask the merchant to re-issue", not "pay the paylink anyway".
 
 #### Before running any `mp x402 request`
 
@@ -384,11 +378,10 @@ If a chain's gas cost spikes beyond its threshold, the server excludes it from `
 | **403** | `PAYLINK_SANCTIONED` | Abort — access restricted; do not retry |
 | **403** | Payer mismatch | Signed payer address doesn't match provisioned identity; verify wallet |
 | **404** | Paylink not found | Verify the paylink ID or URL is correct |
-| **404** | `CHARGE_NOT_FOUND` (charge-resume) | The `chargeToken` does not match an in-flight Charge — confirm via `GET /v1/charge/{chargeToken}`; if that 404s too, re-trigger the upstream checkout. **Do not auto-fall-back to the paylink endpoint** — there's no paylink to derive without a Charge. |
-| **400** | `CHARGE_NOT_SHOPIFY` (charge-resume) | The Charge isn't Shopify-source (likely `source: 'api'` or `'paylink'`). **Do not silently retry against the paylink endpoint** — settling the paylink mints a fresh Charge that doesn't satisfy the original `chargeToken`. Report the failure, surface the orphan-PaylinkTx warning, and only proceed with `POST /v1/x402/checkout/{paylink.id}` after the user explicitly accepts that the original Charge will remain unpaid. |
+| **404** | `CHARGE_NOT_FOUND` (charge-resume) | The `chargeToken` does not match an in-flight Charge — confirm via `GET /v1/charge/{chargeToken}`; if that 404s too, re-trigger the upstream checkout. **Stop. Do not auto-fall-back to the paylink endpoint.** |
 | **409** | Settlement in progress | A payment for this tx is already being settled; do not re-submit |
 | **409** | `CHARGE_ALREADY_SETTLED` (charge-resume) | The Charge is already paid — confirm via `GET /v1/charge/{chargeToken}` and surface the existing tx. **Do not** pay the paylink "again to be safe" — that would double-charge. |
-| **410** | `CHARGE_EXPIRED` (charge-resume) | The Charge expired before settlement. **Do not auto-fall-back to the paylink endpoint** — that mints a fresh Charge, leaves the original unpaid, and orphans your transaction. Ask the merchant to re-issue a Charge with a fresh window, or get explicit user consent for the orphan trade-off. |
+| **410** | `CHARGE_EXPIRED` (charge-resume) | The Charge expired before settlement. **Stop. Ask the merchant to re-issue a Charge with a fresh window.** Do NOT auto-fall-back to the paylink endpoint — that orphans the payment. The user may explicitly invoke "Paylink-direct as last resort" only if the merchant cannot re-issue and they consent to an orphan transaction. |
 | **429** | Rate limited | Back off — 10 requests per 60 seconds per IP |
 
 ### Settlement behavior
@@ -413,9 +406,11 @@ Use this to:
 - Read the on-chain `txSignature` for the charge-resume flow (where it isn't returned in the 200 body).
 - Detect settlement failures the 200 response can't surface (e.g. background sweep reverted, Shopify resolve failed).
 
+The canonical success signal for any charge-resume flow is `paylinkTxs` non-empty (equivalently, `paylinkTx` non-null) on `GET /v1/charge/<token>`. This is the field issuing systems (CMC, billing, Shopify) actually poll. Reporting "paid" before that flips is premature.
+
 Recommended polling: poll once immediately after the 200, then every 5–10s for up to ~120s. Stop polling as soon as the Charge shows a paid/settled state with a transaction signature attached. Surface the settlement tx hash to the user only after this confirmation — do **not** rely on the HTTP 200 alone for the charge-resume flow.
 
-> **If you fell back to the paylink endpoint** (because the Charge wasn't Shopify-source, or the window was closed), `paylinkTxs[]` on this specific Charge will stay **empty** even after a successful on-chain payment — the new `PaylinkTx` is attached to the paylink, not back to the original Charge token. State this plainly to the user: the on-chain transfer landed, but the original Charge token is orphaned and the issuing system will continue to see it as unpaid until they re-issue or manually reconcile.
+> If you took the "Paylink-direct as last resort" path, `paylinkTxs[]` on this specific Charge stays **empty** even after a successful on-chain payment — see that section for the orphan consequence to surface to the user.
 
 ### Example: paying a paylink
 
