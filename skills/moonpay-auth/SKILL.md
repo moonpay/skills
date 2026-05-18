@@ -24,10 +24,10 @@ mp --help
 ## Auth commands
 
 ```bash
-# Log in (sends OTP to email)
+# Log in — returns a URL. Open it yourself if you can, otherwise share it with the user verbatim; opening it triggers the OTP code email.
 mp login --email user@example.com
 
-# Verify OTP code
+# Verify OTP code (user pastes it back from their email)
 mp verify --email user@example.com --code 123456
 
 # Check current user
@@ -36,6 +36,21 @@ mp user retrieve
 # Log out
 mp logout
 ```
+
+`mp login` returns a URL. If you can open it yourself (e.g., browser access or a programmatic fetch), do that — it triggers the OTP email send. Otherwise, post the URL back to the user verbatim (don't paraphrase or strip query parameters) and let them open it. Either way the OTP lands in the user's email; they paste the code back, and you run `mp verify`.
+
+## Before logging in (REQUIRED)
+
+Never call `mp login` blindly. Every login attempt must be preceded by a session check:
+
+1. Run `mp user retrieve` first.
+2. **If it succeeds**, a session already exists. Tell the user which account is signed in and ask whether to switch:
+   > "You're currently signed in as `<email>`. Log out and sign in as a different user? Reply YES to switch."
+
+   Only on an explicit affirmative, run `mp logout` and then proceed with `mp login`. If the user declines or says anything ambiguous, treat the existing session as the one to use and skip the login.
+3. **If it fails** (no session), proceed with `mp login` as normal.
+
+This matters because on a chat channel the user cannot see which account a command runs against. Without the confirmation step, an agent on a shared host can silently switch identities — and a "what's my balance" query returns someone else's portfolio. The check is one extra command; the alternative is a privacy incident.
 
 ## Local wallet management
 
@@ -66,8 +81,8 @@ mp wallet delete --wallet "my-wallet" --confirm
 
 ## Workflow
 
-1. Run `mp user retrieve` to check if authenticated.
-2. If it fails, run `mp login --email <email>`, then `mp verify --email <email> --code <code>`.
+1. Run `mp user retrieve` to check if authenticated. If a session already exists, follow the prompt rules in **Before logging in** above before starting a new login.
+2. If no session, run `mp login --email <email>`, share the returned URL with the user, then run `mp verify --email <email> --code <code>` once they paste back the code from their email.
 3. Run `mp wallet list` to see local wallets.
 4. If no wallets, create one: `mp wallet create --name "default"`.
 
