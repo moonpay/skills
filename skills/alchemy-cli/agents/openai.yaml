@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alchemy CLI"
+  short_description: "Live agent access to Alchemy via the local @alchemy/cli"
+  default_prompt: "Use the Alchemy CLI to query blockchain data, manage apps, or run a live RPC call from the terminal."
