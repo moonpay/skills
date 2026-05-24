@@ -120,13 +120,10 @@ mp message sign --wallet shipp-sports-agent --chain polygon --message "I own thi
 
 # Withdraw winnings to bank
 mp virtual-account offramp create \
-  --name "Offramp" \
-  --bankAccountId <bank-account-id> \
-  --stablecoin usdc \
-  --chain polygon
+  --amount 500 --chain polygon --wallet <polygon-address>
 
 # Hardware wallet (high security)
-mp wallet hardware add --name "shipp-sports-ledger"
+mp wallet add-ledger --name "shipp-sports-ledger"
 ```
 
 ## Funding Options

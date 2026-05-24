@@ -154,6 +154,17 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "perp-skills",
+      "description": "Perpetual futures trading across Hyperliquid, Pacifica, Lighter, and Aster — execute trades, run TWAP/DCA/grid bots, scan funding rate arbitrage, and view multi-exchange portfolio.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/perp-trade",
+        "./skills/perp-arb",
+        "./skills/perp-portfolio"
+      ]
     }
   ]
 }
