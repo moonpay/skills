@@ -34,6 +34,7 @@
         "./skills/moonpay-swap-tokens",
         "./skills/moonpay-trading-automation",
         "./skills/moonpay-upgrade",
+        "./skills/moonpay-vaultsfyi",
         "./skills/moonpay-virtual-account",
         "./skills/moonpay-wallet-statusline-refresh",
         "./skills/moonpay-wallet-statusline",
