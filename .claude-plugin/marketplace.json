@@ -154,6 +154,15 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "metaplex-skills",
+      "description": "Metaplex development on Solana — NFTs, tokens, compressed NFTs, candy machines, token launches, and autonomous agent identity via the mplx CLI and Umi SDK.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/metaplex-development"
+      ]
     }
   ]
 }
