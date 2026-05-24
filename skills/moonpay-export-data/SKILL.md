@@ -52,22 +52,24 @@ Note: EVM wallets share one address across all EVM chains. Solana uses a differe
 Export swap and bridge history. These are transactions executed via the CLI and registered with swaps.xyz — not all on-chain activity.
 
 ```bash
-echo "date,type,from_chain,from_token,from_amount,to_chain,to_token,to_amount,usd,status" \
-  > ~/Documents/moonpay/transactions-$(date +%Y%m%d).csv
+FILE=~/Documents/moonpay/transactions-$(date +%Y%m%d).csv
+echo "date,type,from_chain,from_token,from_amount,to_chain,to_token,to_amount,usd,status" > "$FILE"
 
-mp --json transaction list --wallet <address> \
-  | jq -r '.items[] | [
-      .transactionId,
-      .type,
-      .from.chain, .from.token, .from.amount,
-      .to.chain, .to.token, .to.amount,
-      .usd,
-      .status
-    ] | @csv' \
-  >> ~/Documents/moonpay/transactions-$(date +%Y%m%d).csv
+for CHAIN in solana ethereum base polygon arbitrum; do
+  mp --json transaction list --wallet <address> --chain "$CHAIN" \
+    | jq -r '.items[] | [
+        .transactionId,
+        .type,
+        .from.chain, .from.token, .from.amount,
+        .to.chain, .to.token, .to.amount,
+        .usd,
+        .status
+      ] | @csv' \
+    >> "$FILE" 2>/dev/null
+done
 ```
 
-### Filter by chain
+### Single chain only
 
 ```bash
 mp --json transaction list --wallet <address> --chain solana \
