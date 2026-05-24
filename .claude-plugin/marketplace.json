@@ -154,6 +154,15 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "unbrowse-skills",
+      "description": "Reverse-engineer and call hidden website APIs directly — no browser automation needed. ~100x faster than headless browser, fully local and free.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/unbrowse-web-api"
+      ]
     }
   ]
 }
