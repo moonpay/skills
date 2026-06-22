@@ -154,6 +154,15 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "drip",
+      "description": "Premium financial newsletter, podcast, paid article, and stock-picks research via Drip API with x402/MPP micropayments.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/drip-api"
+      ]
     }
   ]
 }
