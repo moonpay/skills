@@ -154,6 +154,15 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "pulsenetwork-skills",
+      "description": "PulseNetwork x402 paid-data skills — 800+ pay-per-call data endpoints across 74 verticals (crypto market structure, funding rates, whale positions, stablecoin pegs, token safety, plus finance, travel, sports, climate, and health verticals). USDC on Base or Solana, no API key.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/pulsenetwork-paid-data"
+      ]
     }
   ]
 }
