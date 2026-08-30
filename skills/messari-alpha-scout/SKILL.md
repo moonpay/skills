@@ -236,5 +236,4 @@ mp token swap \
 - **messari-token-research** — Deep dive on any asset surfaced by the scan
 - **messari-deep-research** — Full async report on a narrative or asset
 - **moonpay-swap-tokens** — Execute trades after research
-- **moonpay-budget-agent** — Cap daily research spend
 - **moonpay-trading-automation** — Automate the daily brief via cron/launchd

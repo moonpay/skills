@@ -78,6 +78,31 @@ mp token swap \
   --to-token 0x0000000000000000000000000000000000000000
 ```
 
+## Confirm before you broadcast
+
+`mp token swap` and `mp token bridge` sign and broadcast in one shot. There is no
+pending state to cancel and no way to reverse a confirmed transaction, so the
+confirmation has to happen **before** the command runs, not after.
+
+Before either command, state back to the user and get their agreement on:
+
+- the exact amount and the token being spent
+- the token being received, and on which chain
+- for a bridge, the destination wallet — read the address back in full rather than
+  truncating it, because a wrong destination is unrecoverable
+
+Then:
+
+- Resolve symbols to addresses with `mp token search` and show the user which address
+  you resolved to. "USDC" matches many contracts, including worthless impostors with
+  the same symbol; the address is the only unambiguous identifier.
+- Never widen the amount on your own initiative. If a balance check shows the swap
+  cannot cover fees, report that and ask — do not substitute a different amount.
+- Run one swap per confirmation. If a task implies several, confirm the set up front
+  and say how many transactions it will take.
+- On failure, do not retry automatically. A swap can fail after the approve
+  transaction has already landed, so a blind retry can spend twice.
+
 ## Supported chains
 
 solana, ethereum, base, polygon, arbitrum, optimism, bnb, avalanche, bitcoin (bridges only)

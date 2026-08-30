@@ -173,4 +173,3 @@ mp token bridge \
 
 - **moonpay-check-wallet** — Check wallet balances before analyzing on-chain
 - **moonpay-swap-tokens** — Act on findings by swapping tokens
-- **moonpay-bridge-tokens** — Move assets cross-chain informed by your analysis

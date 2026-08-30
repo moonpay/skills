@@ -200,6 +200,14 @@ mp wallet export --wallet "myriad-agent"
 # Copy EVM private key → use in myriad wallet setup or MYRIAD_PRIVATE_KEY
 ```
 
+> **This step is the user's to run, not yours.** `mp wallet export` deliberately
+> requires an interactive terminal, so an agent cannot execute it — see
+> **moonpay-auth**. Hand the command to the user, ask them to paste the key straight
+> into the prompt that needs it, and never run the export, read its output, or copy
+> the key into a file, an environment variable you set, or a message. Recommend a
+> dedicated low-balance wallet: a key pasted into a third-party tool is only as
+> contained as the balance behind it.
+
 ### Check Balance
 
 ```bash
@@ -221,7 +229,7 @@ mp virtual-account offramp create \
 1. `npm i -g @myriadmarkets/cli`
 2. `mp wallet create --name "myriad-agent"`
 3. `mp buy --token usdt_bsc --amount 100 --wallet <address> --email <email>`
-4. `mp wallet export --wallet "myriad-agent"` → copy private key
+4. `mp wallet export --wallet "myriad-agent"` → **user runs this**; copy private key
 5. `myriad wallet setup` → paste key (stored encrypted)
 6. `myriad markets list --state open --order volume --sort desc`
 7. `myriad trade buy --market-id <id> --outcome-id <id> --value 25 --dry-run`

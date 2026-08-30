@@ -56,6 +56,14 @@ mp wallet export --wallet "corbits-agent"
 /corbits init
 ```
 
+> **This step is the user's to run, not yours.** `mp wallet export` deliberately
+> requires an interactive terminal, so an agent cannot execute it — see
+> **moonpay-auth**. Hand the command to the user, ask them to paste the key straight
+> into the prompt that needs it, and never run the export, read its output, or copy
+> the key into a file, an environment variable you set, or a message. Recommend a
+> dedicated low-balance wallet: a key pasted into a third-party tool is only as
+> contained as the balance behind it.
+
 `/corbits init` stores the key in macOS Keychain or `~/.config/corbits/`, scaffolds a TypeScript project with `@faremeter/rides`, and optionally configures a Solana keypair.
 
 ## Key Commands
@@ -169,7 +177,7 @@ fi
 1. `npx clawhub@latest install corbits`
 2. `mp wallet create --name "corbits-agent"`
 3. `mp buy --token usdc_ethereum --amount 50 --wallet <address> --email <email>`
-4. `mp wallet export --wallet "corbits-agent"` — copy EVM private key
+4. `mp wallet export --wallet "corbits-agent"` — **user runs this**; copy EVM private key
 5. `/corbits init` — paste key when prompted
 6. `/corbits search <topic>` — discover APIs
 7. `/corbits call` — payment auto-deducted from MoonPay wallet

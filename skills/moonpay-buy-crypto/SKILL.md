@@ -32,6 +32,10 @@ mp buy \
 
 ## Notes
 
+- Read the `--wallet` destination address back to the user in full before you generate
+  the URL. A purchase sent to a wrong or attacker-supplied address cannot be recalled,
+  and the address is the one argument you are most likely to have inherited from
+  earlier context rather than from the user.
 - This is fiat-to-crypto (credit card / bank), not a token swap.
 - For token-to-token swaps, use the **moonpay-swap-tokens** skill instead.
 - The `--amount` flag is in USD (e.g. `--amount 50` = $50 worth of the token).
