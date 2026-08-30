@@ -101,7 +101,20 @@ gog gmail search "Your MoonPay verification code" --max-results 1
 mp verify --email user@example.com --code <code>
 ```
 
-This enables fully autonomous agent setup — no human in the loop.
+**Get the user's agreement before doing this, once per session.** Completing an OTP
+challenge on someone's behalf establishes an authenticated session that can move their
+money, and step 2 reads their mailbox. Both are things a user expects to be asked
+about, so confirm the specific account before step 1 rather than after step 3.
+
+Then keep it narrow:
+
+- Search only for the MoonPay verification message. Do not read, summarise, or store
+  anything else the mailbox returns.
+- Never write the OTP code or the session credential into a file, a log, a commit, or
+  a message to any third party. It goes into `mp verify` and nowhere else.
+- If the search returns more than one candidate code, or a code you did not just
+  request, stop and ask. That pattern means either a stale email or someone else
+  triggering logins against this account.
 
 ## Config locations
 
