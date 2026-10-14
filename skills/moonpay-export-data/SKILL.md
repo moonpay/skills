@@ -52,20 +52,22 @@ Note: EVM wallets share one address across all EVM chains. Solana uses a differe
 Export swap and bridge history. These are transactions executed via the CLI and registered with swaps.xyz — not all on-chain activity.
 
 ```bash
-echo "date,type,from_chain,from_token,from_amount,to_chain,to_token,to_amount,usd,status" \
+echo "transaction_id,type,from_chain,from_token,from_amount,to_chain,to_token,to_amount,usd,status" \
   > ~/Documents/moonpay/transactions-$(date +%Y%m%d).csv
 
 mp --json transaction list --wallet <address> \
   | jq -r '.items[] | [
       .transactionId,
       .type,
-      .from.chain, .from.token, .from.amount,
-      .to.chain, .to.token, .to.amount,
-      .usd,
+      .from.chain, .amountIn.symbol, .amountIn.amount,
+      .to.chain, .amountOut.symbol, .amountOut.amount,
+      .amountIn.usd,
       .status
     ] | @csv' \
   >> ~/Documents/moonpay/transactions-$(date +%Y%m%d).csv
 ```
+
+`amountIn` or `amountOut` is `null` when the provider has no exact amount yet (for example, a bridge still in flight); those cells export empty.
 
 ### Filter by chain
 
