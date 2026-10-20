@@ -26,6 +26,7 @@ Every strategy uses the same base pattern. Scripts live in `~/.config/moonpay/sc
 set -euo pipefail
 
 MP="$(which mp)"  # absolute path for cron/launchd
+SCRIPT_NAME="dca-sol"
 LOG="$HOME/.config/moonpay/logs/trading.log"
 mkdir -p "$(dirname "$LOG")"
 
@@ -39,6 +40,18 @@ TO_TOKEN="So11111111111111111111111111111111111111111"         # SOL
 AMOUNT=5
 
 # --- Execute ---
+LOCK_ROOT="$HOME/.config/moonpay/locks"
+mkdir -p "$LOCK_ROOT"
+LOCK_DIR="$LOCK_ROOT/${SCRIPT_NAME}.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  log "$SCRIPT_NAME: already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$LOCK_DIR"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 log "SWAP: $AMOUNT $FROM_TOKEN -> $TO_TOKEN on $CHAIN"
 RESULT=$("$MP" --json token swap \
   --wallet "$WALLET" --chain "$CHAIN" \
@@ -55,6 +68,7 @@ Key points:
 - Use `$(which mp)` and store as `MP` — cron/launchd have minimal PATH
 - Wallet names only in scripts — `mp` handles keychain decryption at runtime
 - If the user gives token names/symbols, resolve to addresses first with `mp token search`
+- Give each installed strategy a unique, stable `SCRIPT_NAME` made of letters, digits and hyphens. Every scheduled or manual run of that strategy uses the same lock. Keep it held through price/balance checks, execution and self-disable. A leftover lock must be removed only after confirming no run is active and reconciling any submitted transaction; do not expire it automatically.
 
 ## DCA (Dollar-Cost Averaging)
 
@@ -136,6 +150,19 @@ BUY_AMOUNT=50
 TARGET_PRICE=80
 SCRIPT_NAME="limit-buy-sol"
 
+# --- One run at a time, including manual invocations ---
+LOCK_ROOT="$HOME/.config/moonpay/locks"
+mkdir -p "$LOCK_ROOT"
+LOCK_DIR="$LOCK_ROOT/${SCRIPT_NAME}.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  log "$SCRIPT_NAME: already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$LOCK_DIR"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 # --- Check price ---
 PRICE=$("$MP" --json token search --query "$TOKEN" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
@@ -160,7 +187,8 @@ if (( $(echo "$PRICE < $TARGET_PRICE" | bc -l) )); then
   if [[ "$OSTYPE" == "darwin"* ]]; then
     launchctl unload "$HOME/Library/LaunchAgents/com.moonpay.${SCRIPT_NAME}.plist" 2>/dev/null || true
   else
-    crontab -l | grep -v "$SCRIPT_NAME" | crontab -
+    { crontab -l 2>/dev/null || true; } \
+      | awk -v tag="moonpay:${SCRIPT_NAME}" '$NF != tag' | crontab -
   fi
   log "LIMIT $SCRIPT_NAME: disabled after fill"
 else
@@ -176,17 +204,45 @@ Schedule every 5 minutes:
 
 "Sell all my SOL if price drops below $70"
 
-Same structure as limit order but sells instead of buys. For "sell all", query the balance first:
+This complete variant holds the same strategy lock while checking price,
+reading the sell balance, executing and removing its schedule:
 
 ```bash
+#!/bin/bash
+set -euo pipefail
+
+MP="$(which mp)"
+LOG="$HOME/.config/moonpay/logs/trading.log"
+mkdir -p "$(dirname "$LOG")"
+log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*" >> "$LOG"; }
+
 # --- Config ---
+WALLET="main"
+CHAIN="solana"
 SELL_TOKEN="So11111111111111111111111111111111111111111"   # SOL
 TO_TOKEN="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" # USDC
 TRIGGER_PRICE=70
 SCRIPT_NAME="stop-loss-sol"
 
+LOCK_ROOT="$HOME/.config/moonpay/locks"
+mkdir -p "$LOCK_ROOT"
+LOCK_DIR="$LOCK_ROOT/${SCRIPT_NAME}.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  log "$SCRIPT_NAME: already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$LOCK_DIR"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 # --- Check price ---
 PRICE=$("$MP" --json token search --query "$SELL_TOKEN" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
+
+if [ -z "$PRICE" ] || [ "$PRICE" = "null" ]; then
+  log "STOP-LOSS $SCRIPT_NAME: price fetch failed, skipping"
+  exit 0
+fi
 
 if (( $(echo "$PRICE < $TRIGGER_PRICE" | bc -l) )); then
   # Get current balance to sell all
@@ -203,7 +259,13 @@ if (( $(echo "$PRICE < $TRIGGER_PRICE" | bc -l) )); then
       exit 1
     }
     log "STOP-LOSS $SCRIPT_NAME OK: sold at $PRICE — $RESULT"
-    # Self-disable (same pattern as limit order)
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      launchctl unload "$HOME/Library/LaunchAgents/com.moonpay.${SCRIPT_NAME}.plist" 2>/dev/null || true
+    else
+      { crontab -l 2>/dev/null || true; } \
+        | awk -v tag="moonpay:${SCRIPT_NAME}" '$NF != tag' | crontab -
+    fi
+    log "STOP-LOSS $SCRIPT_NAME: disabled after fill"
   fi
 fi
 ```

@@ -54,17 +54,20 @@ This matters because on a chat channel the user cannot see which account a comma
 
 ## Local wallet management
 
-The CLI manages local wallets stored encrypted in `~/.config/moonpay/wallets.json`. Private keys are encrypted with AES-256-GCM using a random key stored in your OS keychain. No password required — keys never leave the machine.
+The CLI manages encrypted local software wallets and uses the OS keychain to
+unlock them. Agents reference wallets by name or address; the user retains
+control of the recovery material and its backup.
+
+Wallet import is a human prerequisite. The current import flags take raw secret
+values, so an agent must not run or generate commands using `--mnemonic` or
+`--key`, request those values in chat, or move them into environment variables.
+Have the user provision an existing wallet outside the agent session through
+their approved setup, or create a new wallet below if that meets their request.
+After setup, use only the wallet name or address. Export remains human-only too.
 
 ```bash
 # Create a new HD wallet (Solana, Ethereum, Bitcoin, Tron)
 mp wallet create --name "my-wallet"
-
-# Import from a mnemonic (all chains)
-mp wallet import --name "restored" --mnemonic "word1 word2 ..."
-
-# Import from a private key (single chain)
-mp wallet import --name "imported" --key <hex-key> --chain ethereum
 
 # List all local wallets
 mp wallet list
