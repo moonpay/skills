@@ -29,16 +29,19 @@ npm i -g @myriadmarkets/cli
 
 ```bash
 # 1. Create and fund a MoonPay wallet (see Wallet section below)
-# 2. Configure Myriad with your private key
-myriad wallet setup        # interactive — encrypts key to file + OS keychain
-# OR
-export MYRIAD_PRIVATE_KEY="0x..."   # env var
+# 2. Human-only: complete setup in your own interactive terminal
+myriad wallet setup        # encrypts key to file + OS keychain
 
 # 3. Deposit funds
 myriad wallet deposit
 ```
 
 Config resolves in order: CLI flags → env vars / `.env` → `~/.config/myriad/config.json` → built-in defaults.
+
+Agents use the encrypted configuration created by the user's interactive setup.
+Do not request, export, read, or write raw private keys, including through
+`MYRIAD_PRIVATE_KEY`, command arguments, `.env`, logs, or chat. Wait for the user
+to complete wallet setup before continuing with agent-executable commands.
 
 ## Key Commands
 
@@ -193,12 +196,10 @@ mp token bridge \
 
 ### Export Key for Myriad
 
-```bash
-# ⚠️ Your private key gives full access to your wallet.
-# Never share it, commit it to version control, or reuse it across services.
-mp wallet export --wallet "myriad-agent"
-# Copy EVM private key → use in myriad wallet setup or MYRIAD_PRIVATE_KEY
-```
+This migration is human-only. The user may run `mp wallet export --wallet "myriad-agent"`
+and complete `myriad wallet setup` in their own interactive terminal. The agent
+must not run the export, handle its output, or ask the user to paste the key
+into chat. Continue after the user confirms setup.
 
 ### Check Balance
 
@@ -221,8 +222,8 @@ mp virtual-account offramp create \
 1. `npm i -g @myriadmarkets/cli`
 2. `mp wallet create --name "myriad-agent"`
 3. `mp buy --token usdt_bsc --amount 100 --wallet <address> --email <email>`
-4. `mp wallet export --wallet "myriad-agent"` → copy private key
-5. `myriad wallet setup` → paste key (stored encrypted)
+4. Human-only: export the dedicated wallet in the user's own terminal.
+5. Human-only: complete `myriad wallet setup`; the agent waits for confirmation without receiving the key.
 6. `myriad markets list --state open --order volume --sort desc`
 7. `myriad trade buy --market-id <id> --outcome-id <id> --value 25 --dry-run`
 8. `myriad trade buy --market-id <id> --outcome-id <id> --value 25`

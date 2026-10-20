@@ -19,8 +19,9 @@ Refresh the cached MoonPay wallet balances shown in a compatible CLI status line
 - Authenticated: `mp verify`
 - Status line config exists: `~/.config/moonpay/statusline.json`
 - Refresh script exists: `~/.config/moonpay/refresh-statusline.sh`
+- Safe renderer exists: `~/.config/moonpay/render-statusline.sh`
 
-If the config or refresh script is missing, run the `moonpay-wallet-statusline` setup skill first.
+If the config, refresh script or renderer is missing, run the `moonpay-wallet-statusline` setup skill first.
 
 ## Commands
 
@@ -28,11 +29,8 @@ If the config or refresh script is missing, run the `moonpay-wallet-statusline` 
 # Run the refresh script
 bash ~/.config/moonpay/refresh-statusline.sh
 
-# View cached output
-cat ~/.config/moonpay/statusline-cache.txt
-
-# Strip ANSI codes for plain text output
-sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
+# Render sanitized plain text
+bash ~/.config/moonpay/render-statusline.sh --plain
 
 # Check authentication if refresh fails
 mp verify
@@ -43,6 +41,7 @@ mp verify
 1. Verify the setup files exist:
    - `~/.config/moonpay/statusline.json`
    - `~/.config/moonpay/refresh-statusline.sh`
+   - `~/.config/moonpay/render-statusline.sh`
 
 2. Run the refresh command:
 
@@ -50,10 +49,10 @@ mp verify
    bash ~/.config/moonpay/refresh-statusline.sh
    ```
 
-3. If the cache file exists, show the user the refreshed value in plain text:
+3. If `~/.config/moonpay/statusline-cache.json` exists, show the user the refreshed value in plain text:
 
    ```bash
-   sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
+   bash ~/.config/moonpay/render-statusline.sh --plain
    ```
 
 4. If the cache file does not exist after a successful refresh, tell the user no balances were found for the configured address-and-chain entries.
@@ -67,7 +66,7 @@ mp verify
 | Error | Cause | Fix |
 |-------|-------|-----|
 | No config file | Setup not run | Run `moonpay-wallet-statusline` first |
-| No refresh script | Setup not run | Run `moonpay-wallet-statusline` first |
+| No refresh script or renderer | Setup not run or legacy ANSI-cache setup | Run `moonpay-wallet-statusline` first |
 | `mp verify` failed | Auth expired or missing | Run `mp login` then `mp verify` |
 | Refresh exits successfully but cache is missing | No balances on configured entries | Check the configured addresses/chains and verify the wallet has funds |
 

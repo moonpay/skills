@@ -16,9 +16,10 @@ Display cached MoonPay wallet balances in a compatible CLI status line. This ski
 
 - `~/.config/moonpay/statusline.json` — tracked wallets, chains, and format
 - `~/.config/moonpay/refresh-statusline.sh` — refreshes balances from the MoonPay CLI
-- `~/.config/moonpay/statusline-cache.txt` — pre-rendered ANSI output for the status line
+- `~/.config/moonpay/statusline-cache.json` — plain balance data
+- `~/.config/moonpay/render-statusline.sh` — sanitizes data and applies local formatting
 
-Any compatible status display can read the cache file directly.
+Compatible status displays call the renderer. Never print untrusted token metadata or the cache directly as terminal output.
 
 ## Prerequisites
 
@@ -26,7 +27,6 @@ Any compatible status display can read the cache file directly.
 - Authenticated: `mp login` then `mp verify`
 - At least one wallet: `mp wallet list`
 - `jq` installed: `which jq`
-- `bc` installed: `which bc`
 - For status line integration: the target CLI supports a command-based status line or any equivalent scriptable status bar
 
 ## Commands
@@ -60,7 +60,6 @@ Run:
 mp verify
 mp wallet list
 which jq
-which bc
 ```
 
 If the user wants integration with a specific CLI, verify that CLI's status line entry point too.
@@ -134,169 +133,126 @@ Write `~/.config/moonpay/statusline.json`. Each entry must represent exactly one
 
 Write `~/.config/moonpay/refresh-statusline.sh`, then make it executable with `chmod +x ~/.config/moonpay/refresh-statusline.sh`.
 
-This script:
-
-1. Reads `~/.config/moonpay/statusline.json`
-2. Validates that each config entry has one `address` and one `chain`
-3. Fetches balances per configured address and chain
-4. Aborts on any configured fetch error, preserving the previous cache
-5. Formats ANSI-colored output for the status line
-6. Writes the cache atomically
-7. Deletes the cache if no balances are found
+This script fetches one address/chain at a time, preserves the previous JSON cache on an error, and atomically replaces it after every configured fetch succeeds. The cache contains data, never pre-rendered ANSI.
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
 CONFIG="$HOME/.config/moonpay/statusline.json"
-CACHE="$HOME/.config/moonpay/statusline-cache.txt"
+CACHE="$HOME/.config/moonpay/statusline-cache.json"
 TMP_CACHE="$(mktemp "${CACHE}.tmp.XXXXXX")"
+trap 'rm -f "$TMP_CACHE"' EXIT
 
-BOLD_CYAN=$'\033[1;36m'
-WHITE=$'\033[0;37m'
-DIM_GREEN=$'\033[2;32m'
-DIM=$'\033[2m'
-RESET=$'\033[0m'
-
-cleanup() {
-  rm -f "$TMP_CACHE"
-}
-trap cleanup EXIT
-
-require_bin() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "missing dependency: $1" >&2
-    exit 1
-  }
-}
-
-trim_number() {
-  printf "%s" "$1" | sed -E 's/(\.[0-9]*[1-9])0+$/\1/; s/\.0+$//'
-}
-
-format_usd() {
-  printf '$%.2f' "${1:-0}"
-}
-
-join_by() {
-  local separator="$1"
-  shift
-  local first=1
-  for item in "$@"; do
-    if [[ $first -eq 1 ]]; then
-      printf "%s" "$item"
-      first=0
-    else
-      printf "%s%s" "$separator" "$item"
-    fi
-  done
-}
-
-require_bin mp
-require_bin jq
-require_bin bc
-
+command -v mp >/dev/null
+command -v jq >/dev/null
 [[ -f "$CONFIG" ]] || exit 1
-
 FORMAT="$(jq -r '.format // "amount"' "$CONFIG")"
-ENTRY_COUNT="$(jq '.entries | length' "$CONFIG")"
-[[ "$ENTRY_COUNT" -gt 0 ]] || {
-  rm -f "$CACHE"
-  exit 0
-}
-
-declare -a RENDERED=()
-USD_TOTAL="0"
-HAS_USD_TOTAL=0
+jq -e '.entries | type == "array" and all(.[];
+  (.address | type == "string") and (.address | length > 0) and
+  (.chain | type == "string") and (.chain | length > 0))' "$CONFIG" >/dev/null
+ENTRIES='[]'
 
 while IFS= read -r entry; do
-  entry_label="$(jq -r '.label // empty' <<<"$entry")"
   wallet_address="$(jq -r '.address // empty' <<<"$entry")"
   chain="$(jq -r '.chain // empty' <<<"$entry")"
-
   [[ -n "$wallet_address" && -n "$chain" ]] || {
     echo "invalid config entry: each item needs address and chain" >&2
     exit 1
   }
 
   if [[ "$chain" == "bitcoin" ]]; then
-    if ! btc_json="$(mp --json bitcoin balance retrieve --wallet "$wallet_address" 2>/dev/null)"; then
-      echo "failed to fetch bitcoin balance for ${entry_label:-$wallet_address}" >&2
-      exit 1
-    fi
-
-    btc_amount="$(jq -r '.total.btc // empty' <<<"$btc_json")"
-    [[ -n "$btc_amount" && "$btc_amount" != "0" ]] || continue
-
-    amount_display="$(trim_number "$btc_amount")"
-    RENDERED+=("${BOLD_CYAN}₿@bitcoin${RESET} ${WHITE}${amount_display}${RESET}")
-    continue
-  fi
-
-  if ! token_json="$(mp --json token balance list --wallet "$wallet_address" --chain "$chain" 2>/dev/null)"; then
-    echo "failed to fetch token balances for ${entry_label:-$wallet_address} on ${chain}" >&2
-    exit 1
-  fi
-
-  while IFS= read -r token_entry; do
-    symbol="$(jq -r '.symbol // empty' <<<"$token_entry")"
-    amount="$(jq -r '.balance.amount // empty' <<<"$token_entry")"
-    usd_value="$(jq -r '.balance.value // empty' <<<"$token_entry")"
-
-    [[ -n "$symbol" && -n "$amount" ]] || continue
-    amount_display="$(trim_number "$amount")"
-    token_label="${symbol}@${chain}"
-
-    if [[ -n "$usd_value" && "$usd_value" != "null" ]]; then
-      USD_TOTAL="$(echo "$USD_TOTAL + $usd_value" | bc -l)"
-      HAS_USD_TOTAL=1
-    fi
-
-    case "$FORMAT" in
-      amount)
-        RENDERED+=("${BOLD_CYAN}${token_label}${RESET} ${WHITE}${amount_display}${RESET}")
-        ;;
-      amount+usd)
-        if [[ -n "$usd_value" && "$usd_value" != "null" ]]; then
-          RENDERED+=("${BOLD_CYAN}${token_label}${RESET} ${WHITE}${amount_display}${RESET} ${DIM_GREEN}($(format_usd "$usd_value"))${RESET}")
-        else
-          RENDERED+=("${BOLD_CYAN}${token_label}${RESET} ${WHITE}${amount_display}${RESET}")
-        fi
-        ;;
-      total+breakdown)
-        if [[ -n "$usd_value" && "$usd_value" != "null" ]]; then
-          RENDERED+=("${BOLD_CYAN}${token_label}${RESET} ${WHITE}${amount_display}${RESET} ${DIM_GREEN}($(format_usd "$usd_value"))${RESET}")
-        else
-          RENDERED+=("${BOLD_CYAN}${token_label}${RESET} ${WHITE}${amount_display}${RESET}")
-        fi
-        ;;
-      *)
-        RENDERED+=("${BOLD_CYAN}${token_label}${RESET} ${WHITE}${amount_display}${RESET}")
-        ;;
-    esac
-  done < <(
-    jq -c '
+    data="$(mp --json bitcoin balance retrieve --wallet "$wallet_address")"
+    next="$(jq -c '[select(((.total.btc | tonumber?) // 0) > 0)
+      | {symbol: "₿", chain: "bitcoin", amount: (.total.btc | tostring), usd: null}]' <<<"$data")"
+  else
+    data="$(mp --json token balance list --wallet "$wallet_address" --chain "$chain")"
+    next="$(jq -c --arg chain "$chain" '[
       (.items // . // [])[]
-      | select(((.balance.amount // "0") | tonumber? // 0) > 0)
-    ' <<<"$token_json"
-  )
+      | select(((.balance.amount | tonumber?) // 0) > 0)
+      | {symbol: .symbol, chain: $chain, amount: .balance.amount, usd: .balance.value}
+    ]' <<<"$data")"
+  fi
+  ENTRIES="$(jq -cn --argjson current "$ENTRIES" --argjson next "$next" '$current + $next')"
 done < <(jq -c '.entries[]' "$CONFIG")
 
-if [[ ${#RENDERED[@]} -eq 0 ]]; then
+if [[ "$(jq 'length' <<<"$ENTRIES")" -eq 0 ]]; then
   rm -f "$CACHE"
   exit 0
 fi
 
-SEPARATOR="${DIM} | ${RESET}"
-TOKENS_LINE="$(join_by "$SEPARATOR" "${RENDERED[@]}")"
+jq -an --arg format "$FORMAT" --argjson entries "$ENTRIES" \
+  '{format: $format, entries: $entries}' > "$TMP_CACHE"
+mv "$TMP_CACHE" "$CACHE"
+```
 
-if [[ "$FORMAT" == "total+breakdown" && "$HAS_USD_TOTAL" -eq 1 ]]; then
-  printf "%s%s%s" "${DIM_GREEN}$(format_usd "$USD_TOTAL")${RESET}" "$SEPARATOR" "$TOKENS_LINE" >"$TMP_CACHE"
-else
-  printf "%s" "$TOKENS_LINE" >"$TMP_CACHE"
+Write `~/.config/moonpay/render-statusline.sh` and make it executable too. This is the only terminal-rendering path. It strips C0/C1 controls and backslashes from labels before applying locally controlled ANSI colors. Backslashes are removed so an existing status-line wrapper cannot reinterpret an upstream `\033` escape. Symbols are capped at 16 characters; amounts are accepted only as decimal data. Use `--plain` for displays without ANSI support.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+CACHE="$HOME/.config/moonpay/statusline-cache.json"
+[[ -f "$CACHE" ]] || exit 0
+FORMAT="$(jq -r '.format // "amount"' "$CACHE")"
+BOLD_CYAN=$'\033[1;36m'
+WHITE=$'\033[0;37m'
+DIM_GREEN=$'\033[2;32m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
+if [[ "${1:-}" == "--plain" ]]; then
+  BOLD_CYAN='' WHITE='' DIM_GREEN='' DIM='' RESET=''
 fi
 
-mv "$TMP_CACHE" "$CACHE"
+trim_number() {
+  printf '%s' "$1" | sed -E 's/(\.[0-9]*[1-9])0+$/\1/; s/\.0+$//'
+}
+format_usd() { printf '$%.2f' "$1"; }
+
+declare -a RENDERED=()
+HAS_USD_TOTAL=0
+USD_TOTAL="$(jq '[.entries[].usd | tonumber?] | add // 0' "$CACHE")"
+while IFS=$'\t' read -r symbol chain amount usd_value; do
+  amount_display="$(trim_number "$amount")"
+  item="${BOLD_CYAN}${symbol}@${chain}${RESET} ${WHITE}${amount_display}${RESET}"
+  if [[ "$usd_value" != "null" ]]; then
+    HAS_USD_TOTAL=1
+    if [[ "$FORMAT" == "amount+usd" || "$FORMAT" == "total+breakdown" ]]; then
+      item="${item} ${DIM_GREEN}($(format_usd "$usd_value"))${RESET}"
+    fi
+  fi
+  RENDERED+=("$item")
+done < <(jq -r '
+  def safe: tostring | explode
+    | map(select(. >= 32 and (. < 127 or . > 159) and . != 92)) | implode;
+  .entries[]
+  | select(.symbol | type == "string")
+  | select(.amount | tostring | test("^[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$"))
+  | select((.amount | tonumber) > 0)
+  | [(.symbol | safe | .[0:16]), (.chain | safe | .[0:32]),
+     (.amount | tostring), ((.usd | tonumber?) // "null" | tostring)]
+  | select(.[0] != "" and .[1] != "")
+  | @tsv
+' "$CACHE")
+
+[[ ${#RENDERED[@]} -gt 0 ]] || exit 0
+SEPARATOR="${DIM} | ${RESET}"
+if [[ "$FORMAT" == "total+breakdown" && "$HAS_USD_TOTAL" -eq 1 ]]; then
+  printf '%s%s' "${DIM_GREEN}$(format_usd "$USD_TOTAL")${RESET}" "$SEPARATOR"
+fi
+first=1
+for item in "${RENDERED[@]}"; do
+  [[ "$first" -eq 1 ]] || printf '%s' "$SEPARATOR"
+  printf '%s' "$item"
+  first=0
+done
+```
+
+Update existing integrations to use this renderer, and remove the superseded ANSI cache after migration:
+
+```bash
+chmod +x ~/.config/moonpay/render-statusline.sh
+rm -f ~/.config/moonpay/statusline-cache.txt
 ```
 
 ### 6. Run initial refresh
@@ -305,38 +261,16 @@ mv "$TMP_CACHE" "$CACHE"
 bash ~/.config/moonpay/refresh-statusline.sh
 ```
 
-Verify the cache file:
+Verify the structured cache and its safe rendering:
 
 ```bash
-cat ~/.config/moonpay/statusline-cache.txt
-```
-
-For plain text:
-
-```bash
-sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
+jq . ~/.config/moonpay/statusline-cache.json
+bash ~/.config/moonpay/render-statusline.sh --plain
 ```
 
 ### 7. Wire into a compatible CLI
 
-The generic pattern is:
-
-1. Find the status line script or inline command used by the target CLI
-2. Read `~/.config/moonpay/statusline-cache.txt`
-3. Append that cached output to the existing status line
-4. Preserve ANSI colors if the CLI supports them
-
-Any CLI that can run a script on status line render can use the cached output directly:
-
-```bash
-cat ~/.config/moonpay/statusline-cache.txt
-```
-
-If the target CLI does not support ANSI colors, strip them first:
-
-```bash
-sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
-```
+Find the target CLI's status-line script and append the renderer's output to its existing line. Run `bash ~/.config/moonpay/render-statusline.sh` for colors or add `--plain` for a plain display. Keep the final output's format string local, for example `printf '%s\n' "$LINE3"`.
 
 #### Claude Code example
 
@@ -344,11 +278,7 @@ Add this block to `~/.claude/statusline.sh` before the final render/output secti
 
 ```bash
 # Wallet balances
-WALLET_CACHE="$HOME/.config/moonpay/statusline-cache.txt"
-WALLET_STR=""
-if [ -f "$WALLET_CACHE" ]; then
-  WALLET_STR="$(cat "$WALLET_CACHE")"
-fi
+WALLET_STR="$(bash "$HOME/.config/moonpay/render-statusline.sh")"
 
 if [ -n "$WALLET_STR" ]; then
   [ -n "$LINE3" ] && LINE3="${LINE3}${SEP}"
@@ -407,11 +337,7 @@ Optional on Claude Code v2.1.85+: add a `PostToolUse` hook to `~/.claude/setting
 Cursor CLI uses `~/.cursor/cli-config.json` with a `statusLine.command` entry that typically points at `~/.cursor/statusline.sh`. Add the same cache-read pattern to that script, for example:
 
 ```bash
-WALLET_CACHE="$HOME/.config/moonpay/statusline-cache.txt"
-WALLET_STR=""
-if [ -f "$WALLET_CACHE" ]; then
-  WALLET_STR="$(cat "$WALLET_CACHE")"
-fi
+WALLET_STR="$(bash "$HOME/.config/moonpay/render-statusline.sh")"
 
 if [ -n "$WALLET_STR" ]; then
   [ -n "$LINE3" ] && LINE3="${LINE3}${SEP}"
@@ -426,29 +352,25 @@ If the user's script uses different variable names or a single-line layout, adap
 For any other CLI tool with a scriptable status line:
 
 - locate the script or command used for the status line
-- append `cat ~/.config/moonpay/statusline-cache.txt` or the ANSI-stripped variant
+- append the output of `bash ~/.config/moonpay/render-statusline.sh` (or its `--plain` variant)
 - if the tool supports command hooks or post-command automation, wire `bash ~/.config/moonpay/refresh-statusline.sh` into that mechanism
 
 ### 8. Confirm
 
 Tell the user:
 
-- The cache file is `~/.config/moonpay/statusline-cache.txt`
+- The data cache is `~/.config/moonpay/statusline-cache.json`; terminal output comes from `render-statusline.sh`
 - Run `moonpay-wallet-statusline-refresh` to refresh manually
 - Changes appear in the target CLI on the next status line render or next session, depending on local setup
 
 ## Other agents
 
-Any agent with a terminal status display can read the cache file directly:
+Any agent with a terminal status display can call the same renderer:
 
 ```bash
-cat ~/.config/moonpay/statusline-cache.txt
-```
-
-If the target status display does not support ANSI colors, strip ANSI codes first:
-
-```bash
-sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
+bash ~/.config/moonpay/render-statusline.sh
+# For plain text:
+bash ~/.config/moonpay/render-statusline.sh --plain
 ```
 
 ## Error handling
@@ -457,7 +379,6 @@ sed 's/\x1b\[[0-9;]*m//g' ~/.config/moonpay/statusline-cache.txt
 |-------|-------|-----|
 | `mp: command not found` | MoonPay CLI not installed | `npm i -g @moonpay/cli` |
 | `jq: command not found` | jq not installed | Install via package manager |
-| `bc: command not found` | bc not installed | Install via package manager |
 | `mp verify` failed | Not authenticated or expired auth | Run `mp login` then `mp verify` |
 | Empty cache after refresh | No balances found on configured entries | Check configured addresses/chains and verify the wallet has funds |
 | Status line does not update in the target CLI | CLI status line not set up yet or cache not wired in | Configure that CLI's status line first, then add the wallet cache block |

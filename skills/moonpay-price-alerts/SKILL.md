@@ -39,6 +39,18 @@ TARGET=80
 DIRECTION="below"  # "above" or "below"
 SCRIPT_NAME="alert-sol-below-80"
 
+LOCK_ROOT="$HOME/.config/moonpay/locks"
+mkdir -p "$LOCK_ROOT"
+LOCK_DIR="$LOCK_ROOT/${SCRIPT_NAME}.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  log "$SCRIPT_NAME: already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$LOCK_DIR"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 # --- Check price ---
 PRICE=$("$MP" --json token search --query "$SYMBOL" --chain "$CHAIN" | jq -r '.items[0].marketData.price')
 
@@ -70,7 +82,8 @@ if [ "$TRIGGERED" = true ]; then
   if [[ "$OSTYPE" == "darwin"* ]]; then
     launchctl unload "$HOME/Library/LaunchAgents/com.moonpay.${SCRIPT_NAME}.plist" 2>/dev/null || true
   else
-    crontab -l | grep -v "$SCRIPT_NAME" | crontab -
+    { crontab -l 2>/dev/null || true; } \
+      | awk -v tag="moonpay:${SCRIPT_NAME}" '$NF != tag' | crontab -
   fi
   log "ALERT $SCRIPT_NAME: disabled after trigger"
 else
@@ -119,7 +132,11 @@ Load: `launchctl load ~/Library/LaunchAgents/com.moonpay.alert-sol-below-80.plis
 
 "Alert me every hour while ETH is above $2000" — keeps firing on each check, doesn't self-disable.
 
-Same script as above but remove the self-disable block. The alert fires every time the condition is met, until the user manually removes it.
+Same script as above but remove only the self-disable block. Keep the lock guard:
+it prevents overlapping checks from producing duplicate notifications while
+allowing the next scheduled run after the current one exits. Use a unique,
+stable `SCRIPT_NAME` for each installed alert. Remove a leftover lock only after
+confirming that alert is no longer running.
 
 ## Managing alerts
 

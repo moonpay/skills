@@ -117,14 +117,34 @@ mp x402 request \
 
 ## Full workflow script
 
+Use this script for scheduled or manually retriggered scans. It acquires one
+lock before any paid request and holds it through the complete input scan.
+Keep a stable, unique `SCRIPT_NAME` per installed wallet/chain workflow. Remove
+a leftover lock only after confirming the previous process has stopped and
+reconciling any paid requests; do not expire it automatically.
+
 ```bash
 #!/bin/bash
 # messari-alpha-scout.sh
 # Runs a full alpha scan and saves results
+set -euo pipefail
 
 WALLET="main"
 CHAIN="base"
+SCRIPT_NAME="messari-alpha-scout"
 BASE="https://api.messari.io"
+LOCK_ROOT="$HOME/.config/moonpay/locks"
+mkdir -p "$LOCK_ROOT"
+LOCK_DIR="$LOCK_ROOT/${SCRIPT_NAME}.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  echo "$SCRIPT_NAME: already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$LOCK_DIR"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 OUT="$HOME/.config/moonpay/research/alpha-$(date -u +%Y%m%d-%H%M%S)"
 mkdir -p "$(dirname "$OUT")"
 
