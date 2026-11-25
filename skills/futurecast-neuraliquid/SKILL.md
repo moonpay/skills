@@ -14,10 +14,10 @@ Offer inspection requires only curl. The commands below use jq to select fields.
 
 ## Inspect the offer
 
-Use a plain GET. This sends no payment authorization. A healthy offer returns HTTP 402 with the price, recipient and network. Keep the original URL for checkout. If the user supplies a referral code, append its `?ref=CODE` to this exact endpoint for both requests.
+Use a plain GET. This sends no payment authorization. A healthy offer returns HTTP 402 with the price, recipient and network. Keep the original URL for checkout. If the user supplies a referral code, append `&ref=CODE` to this exact endpoint for both requests.
 
 ```bash
-offer_url='https://futurecast.ml85.xyz/api/v1/x402/signals/patterns'
+offer_url=https://futurecast.ml85.xyz/api/v1/x402/signals/patterns?utm_source=moonpay
 curl -q -sS "$offer_url" | jq '{terms: .resource.description, accepts}'
 ```
 
@@ -25,7 +25,7 @@ Check for one exact offer on `eip155:8453`, for 5,000,000 atomic units of Base U
 
 ## Buy once with a MoonPay wallet
 
-First check for a saved pass at the usual or operator-specified location and for any unresolved prior checkout. If a prior payment has an unknown outcome and its receipt is missing, reconcile it with the wallet owner before proceeding. For a MoonPay receipt, go directly to reading it below. For a pass bought with the FutureCast client, use its existing access file and the resume command in the [quickstart](https://futurecast.ml85.xyz/quickstart). Run the purchase only when the owner authorizes 5 USDC for this pass. Use the approved wallet name in place of `main`. Save the response privately because it contains the bearer token. The spend limit below applies only to Base USDC for this command.
+First check for a saved pass at the usual or operator-specified location and for any unresolved prior checkout. If a prior payment has an unknown outcome and its receipt is missing, reconcile it with the wallet owner before proceeding. For a MoonPay receipt, go directly to reading it below. For a pass bought with the FutureCast client, use its existing access file and the resume command in the [quickstart](https://futurecast.ml85.xyz/quickstart?utm_source=moonpay). Run the purchase only when the owner authorizes 5 USDC for this pass. Use the approved wallet name in place of `main`. Save the response privately because it contains the bearer token. The spend limit below applies only to Base USDC for this command.
 
 ```bash
 pass_dir="${XDG_STATE_HOME:-$HOME/.local/state}/neuraliquid"
@@ -50,7 +50,7 @@ For a saved pass in a new shell, set `pass_dir` as above. Read the same endpoint
   set -e -o pipefail
   pass_header=$(jq -er '.data.access_token | strings | select(test("^[a-f0-9]{64}$")) | "Authorization: Bearer " + .' "$pass_dir/pass.json")
   printf '%s\n' "$pass_header" |
-    curl -q -sS --header @- 'https://futurecast.ml85.xyz/api/v1/x402/signals/patterns' |
+    curl -q -sS --header @- 'https://futurecast.ml85.xyz/api/v1/x402/signals/patterns?utm_source=moonpay' |
     jq '{status, expires_in, signals: .data.signals, detail}'
 )
 ```
@@ -59,4 +59,4 @@ Poll pending payments at the advertised interval. Once confirmed, space feed rea
 
 ## Optional referrals
 
-A buyer can register the paying wallet after its first confirmed purchase. A selected launch partner can register an invited wallet before buying a pass. At the current price, a qualifying direct sale earns 1.70 USDC (34%) after the buyer's transfer is finalized. Use the wallet registration flow when the operator asks for a personal link. Keep wallet keys and private rewards credentials local, and disclose the commission when sharing the link. [Partner applications and instructions](https://futurecast.ml85.xyz/partners) · [API quickstart](https://futurecast.ml85.xyz/quickstart)
+A buyer can register the paying wallet after its first confirmed purchase. A selected launch partner can register an invited wallet before buying a pass. At the current price, a qualifying direct sale earns 1.70 USDC (34%) after the buyer's transfer is finalized. Use the wallet registration flow when the operator asks for a personal link. Keep wallet keys and private rewards credentials local, and disclose the commission when sharing the link. [Partner applications and instructions](https://futurecast.ml85.xyz/partners?utm_source=moonpay) · [API quickstart](https://futurecast.ml85.xyz/quickstart?utm_source=moonpay)
