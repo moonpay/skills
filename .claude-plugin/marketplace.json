@@ -157,7 +157,7 @@
     },
     {
       "name": "futurecast-skills",
-      "description": "NeuraLiquid watchlist research and reusable x402 day passes on Base",
+      "description": "Revisioned watchlist events on Base with reusable x402 passes and optional MCP checkout",
       "source": "./",
       "strict": false,
       "skills": [

@@ -1,12 +1,19 @@
 ---
 name: futurecast-neuraliquid
-description: Use when a user wants to evaluate NeuraLiquid for a crypto watchlist, buy a day of directional observations with a MoonPay wallet on Base, or read an existing NeuraLiquid pass.
+description: Use when a user wants to evaluate NeuraLiquid for a crypto watchlist, buy a day of directional observations with a MoonPay wallet on Base, or use its optional MCP client for budgeted checkout and revisioned event reads.
 tags: [research, watchlists, x402, base]
 ---
 
 # NeuraLiquid watchlist feed
 
 A single pass covers 24 hours of reads for 5 USDC on Base, starting at finalized payment confirmation. A watchlist can filter observations by token, discard entries older than its alert window and deduplicate on token, UTC time and direction (long or short). The feed runs in dryrun and can be empty.
+
+
+## Revisioned events and MCP checkout
+
+Inspect the [historical event example](https://futurecast.ml85.xyz/api/v2/signals/example) for free. With an existing x402 pass, call `read_agent_events` in the [NeuraLiquid MCP client](https://github.com/Marcolist/neuraliquid-mcp). Keep its `next_cursor` and send it as `cursor` on the next read, at least 30 seconds later. Each revision identifies the candle, observation time, direction or conflict, and expiry. Direct HTTP clients select `?view=events-v2` on the paid endpoint with their existing bearer token.
+
+For operators who prefer MCP checkout, `buy_or_resume_pass` can buy one 5 USDC Base day pass using a separately configured, authorized wallet and budget. Resume pending purchases with the same private pass file.
 
 ## Prerequisites
 
