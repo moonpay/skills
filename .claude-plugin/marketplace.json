@@ -154,6 +154,15 @@
       "skills": [
         "./skills/nansen-dca-tracker"
       ]
+    },
+    {
+      "name": "futurecast-skills",
+      "description": "BTC/ETH snapshots for 0.05 USDC or a 5 USDC day pass with x402 and optional MCP checkout on Base",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/futurecast-neuraliquid"
+      ]
     }
   ]
 }
