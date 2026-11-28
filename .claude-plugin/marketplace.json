@@ -157,7 +157,7 @@
     },
     {
       "name": "futurecast-skills",
-      "description": "Revisioned watchlist events on Base with reusable x402 passes and optional MCP checkout",
+      "description": "BTC/ETH snapshots for 0.05 USDC or a 5 USDC day pass with x402 and optional MCP checkout on Base",
       "source": "./",
       "strict": false,
       "skills": [

@@ -1,10 +1,27 @@
 ---
 name: futurecast-neuraliquid
-description: Use when a user wants to evaluate NeuraLiquid for a crypto watchlist, buy a day of directional observations with a MoonPay wallet on Base, or use its optional MCP client for budgeted checkout and revisioned event reads.
+description: Check a one-time BTC/ETH snapshot for 0.05 USDC on Base, use the 5 USDC day pass for continuous watchlist events, or recover an approved x402 purchase with MCP.
 tags: [research, watchlists, x402, base]
 ---
 
 # NeuraLiquid watchlist feed
+
+## One BTC/ETH observation set for 0.05 USDC
+
+Use a single snapshot when a research agent already has a price quote and wants to check the direction and observation time of a BTC or ETH alert. The signal comes from a paper-trading engine. Either market can appear alone. The 5 USDC day pass below is for continuous updates.
+
+Inspect the snapshot with an unsigned GET:
+
+```bash
+curl -q -sS 'https://futurecast.ml85.xyz/api/v1/x402/signals/btc-eth-snapshot?utm_source=moonpay' | jq '{accepts, detail}'
+```
+
+An available snapshot returns HTTP 402 with exactly 50,000 atomic USDC units on Base (eip155:8453). HTTP 409 means there is no active eligible observation. HTTP 503 indicates unavailability. Neither response asks for payment.
+
+In [NeuraLiquid MCP v1.4.0](https://github.com/Marcolist/neuraliquid-mcp/releases/tag/v1.4.0), use `inspect_btc_eth_snapshot` and `check_purchase_readiness(product="btc_eth_snapshot")`. After operator approval, `buy_or_resume_btc_eth_snapshot` uses a dedicated snapshot receipt file. Reuse the same file if confirmation is pending. Once finalized, the receipt retrieves the same token, direction and UTC observation time for 24 hours. [Snapshot checkout](https://futurecast.ml85.xyz/quickstart?utm_source=moonpay#btc-eth-snapshot)
+
+## Continuous watchlist access
+
 
 A single pass covers 24 hours of reads for 5 USDC on Base, starting at finalized payment confirmation. A watchlist can filter observations by token, discard entries older than its alert window and deduplicate on token, UTC time and direction (long or short). The feed runs in dryrun and can be empty.
 
@@ -66,4 +83,4 @@ Poll pending payments at the advertised interval. Once confirmed, space feed rea
 
 ## Optional referrals
 
-Open referral registration runs from 26 November 2026 at 22:00 UTC until 26 December 2026 at 22:00 UTC. Sign with a Base wallet to create a personal link without purchasing a pass. A link registered in this window keeps earning after enrollment closes. Outside the window, new wallets need a confirmed purchase or a partner invitation. Access to the live feed requires a paid pass. A qualifying 5 USDC sale pays 1.70 USDC (34%) after the buyer's transfer is finalized. Use the wallet registration flow when the operator asks for a personal link. Keep wallet keys and private rewards credentials local, and disclose the commission when sharing the link. [Partner applications and instructions](https://futurecast.ml85.xyz/partners?utm_source=moonpay) · [API quickstart](https://futurecast.ml85.xyz/quickstart?utm_source=moonpay)
+Open referral registration runs from 26 November 2026 at 22:00 UTC until 26 December 2026 at 22:00 UTC. Sign with a Base wallet to create a personal link without purchasing a pass. A link registered in this window keeps earning after enrollment closes. Outside the window, new wallets need a confirmed purchase or a partner invitation. Access to the live feed requires a paid pass. A qualifying snapshot pays 0.017 USDC and a qualifying day pass pays 1.70 USDC (34%) after the buyer's transfer is finalized. Use the wallet registration flow when the operator asks for a personal link. Keep wallet keys and private rewards credentials local, and disclose the commission when sharing the link. [Partner applications and instructions](https://futurecast.ml85.xyz/partners?utm_source=moonpay) · [API quickstart](https://futurecast.ml85.xyz/quickstart?utm_source=moonpay)
